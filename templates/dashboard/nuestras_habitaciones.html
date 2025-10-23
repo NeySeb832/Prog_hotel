@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel Elegance — Habitaciones</title>
+
+  <!-- Bootstrap 5 + Icons (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --radius: 16px;
+      --brand-dark: #000;            /* Color “negro” para hover/active en navbar */
+      --brand-on-dark: #fff;         /* Texto sobre el negro */
+    }
+
+    /* -----------------------------
+       NAVBAR (interactiva)
+       ----------------------------- */
+    .navbar-brand i{ margin-right:.5rem; }
+
+    .navbar .nav-link{
+      border-radius:999px;
+      padding:.4rem .9rem !important;
+      color:#212529;
+      transition:background-color .15s ease, color .15s ease;
+    }
+    /* Hover + Focus: botón negro */
+    .navbar .nav-link:hover,
+    .navbar .nav-link:focus{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+      text-decoration:none;
+      outline:none;
+    }
+    /* Activo (página actual) */
+    .navbar .nav-link.active,
+    .navbar .nav-link[aria-current="page"]{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+    }
+
+    /* -----------------------------
+       ENCABEZADO DE SECCIÓN
+       ----------------------------- */
+    .section-head{
+      text-align:center;
+      margin:2.2rem 0 1.2rem;
+    }
+    .section-head h2{ font-weight:700; }
+    .section-head p{ color:#6c757d; max-width:720px; margin:0 auto; }
+
+    /* -----------------------------
+       TARJETAS DE HABITACIONES
+       ----------------------------- */
+    .room-card.card{
+      border:0;
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 8px 24px rgba(9,12,32,.08);
+      transition:transform .15s ease, box-shadow .15s ease;
+      height:100%;
+    }
+    .room-card.card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 36px rgba(9,12,32,.12);
+    }
+    .room-img{
+      width:100%;
+      height:220px;        /* ajusta si necesitas más alto */
+      object-fit:cover;
+    }
+    .room-title-line{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;
+    }
+    .room-price{
+      font-weight:800; font-size:1.1rem; white-space:nowrap;
+    }
+    .room-price small{ color:#6c757d; font-weight:600; }
+
+    /* Lista de amenidades con scroll (como en tu imagen) */
+    .amenities{
+      max-height:160px;    /* hace aparecer la barrita */
+      overflow:auto;
+      padding-right:.25rem;
+    }
+    .amenities li{ margin:.35rem 0; color:#222; }
+    .amenities .bi{ color:#0d6efd; margin-right:.45rem; }
+
+    /* Scrollbar sutil en navegadores WebKit */
+    .amenities::-webkit-scrollbar{ width:6px; }
+    .amenities::-webkit-scrollbar-thumb{ background:#cdd4df; border-radius:6px; }
+
+    /* -----------------------------
+       FOOTER
+       ----------------------------- */
+    footer{
+      background:#f3f4f6;
+      border-top:1px solid rgba(0,0,0,.06);
+    }
+    .footer-bottom{
+      border-top:1px solid rgba(0,0,0,.08);
+      color:#8a93a1;
+      font-size:.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       NAVBAR
+       Reemplaza cada href="#" por tus rutas reales cuando las tengas:
+         - Inicio:        /  (o la que definas)
+         - Habitaciones:  /habitaciones/
+         - Servicios:     /servicios/
+         - Nosotros:      /nosotros/
+         - Contacto:      /contacto/
+         - Login:         /login/
+       ========================================================= -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container">
+      <!-- LOGO / HOME -->
+      <a class="navbar-brand fw-semibold" href="/">
+        <!-- Ruta: INICIO -->
+        <i class="bi bi-building"></i> Hotel Elegance
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="mainNav" class="collapse navbar-collapse">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <!-- Ruta: INICIO -->
+            <a class="nav-link" href="/" data-route="inicio">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <!-- Ruta: HABITACIONES -->
+            <a class="nav-link active" href="/nuestras_habitaciones/" data-route="habitaciones" aria-current="page">Habitaciones</a>
+          </li>
+          <li class="nav-item">
+            <!-- Ruta: SERVICIOS -->
+            <a class="nav-link" href="/nuestros_servicios/" data-route="servicios">Servicios</a>
+          </li>
+          <li class="nav-item">
+            <!-- Ruta: NOSOTROS -->
+            <a class="nav-link" href="/sobre_nosotros/" data-route="nosotros">Nosotros</a>
+          </li>
+          <li class="nav-item">
+            <!-- Ruta: CONTACTO -->
+            <a class="nav-link" href="/contacto" data-route="contacto">Contacto</a>
+          </li>
+        </ul>
+
+        <!-- Ruta: LOGIN -->
+        <a class="btn btn-dark btn-sm rounded-3" href="#">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- =========================================================
+       ENCABEZADO DE PÁGINA
+       ========================================================= -->
+  <header class="container">
+    <div class="section-head">
+      <h2>Nuestras Habitaciones</h2>
+      <p>Descubre nuestras elegantes habitaciones y suites, diseñadas para ofrecer el máximo confort y lujo.</p>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       GRID DE HABITACIONES (3 tarjetas)
+       ========================================================= -->
+  <main class="container pb-4">
+    <div class="row g-4">
+
+      <!-- Habitación Estándar -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card room-card h-100">
+          <img class="room-img"
+               src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1200&auto=format&fit=crop"
+               alt="Habitación estándar" />
+          <div class="card-body">
+            <div class="room-title-line">
+              <h5 class="card-title mb-1">Habitación Estándar</h5>
+              <div class="room-price">$150<small>/noche</small></div>
+            </div>
+
+            <ul class="amenities list-unstyled mb-3">
+              <li><i class="bi bi-star"></i> Cama matrimonial (1.80m x 2.00m)</li>
+              <li><i class="bi bi-star"></i> TV LED 42" con canales premium</li>
+              <li><i class="bi bi-star"></i> Aire acondicionado individual</li>
+              <li><i class="bi bi-star"></i> Minibar con bebidas y snacks</li>
+              <li><i class="bi bi-star"></i> Caja fuerte digital</li>
+              <li><i class="bi bi-star"></i> Wifi gratuito de alta velocidad</li>
+              <li><i class="bi bi-star"></i> Escritorio de trabajo</li>
+            </ul>
+
+            <!-- Ruta: RESERVAR estándar -->
+
+            <a href="#" class="btn btn-dark w-100 rounded-pill">Reservar Ahora</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suite Junior -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card room-card h-100">
+          <img class="room-img"
+               src="https://images.unsplash.com/photo-1601918774946-25832a4be0d6?q=80&w=1200&auto=format&fit=crop"
+               alt="Suite Junior" />
+          <div class="card-body">
+            <div class="room-title-line">
+              <h5 class="card-title mb-1">Suite Junior</h5>
+              <div class="room-price">$250<small>/noche</small></div>
+            </div>
+
+            <ul class="amenities list-unstyled mb-3">
+              <li><i class="bi bi-star"></i> Cama king size (2.00m x 2.00m)</li>
+              <li><i class="bi bi-star"></i> Sala de estar con sofá cama</li>
+              <li><i class="bi bi-star"></i> TV LED 55" (dormitorio) + 42" (sala)</li>
+              <li><i class="bi bi-star"></i> Jacuzzi privado con vista</li>
+              <li><i class="bi bi-star"></i> Minibar premium incluido</li>
+              <li><i class="bi bi-star"></i> Aire acondicionado dual zone</li>
+              <li><i class="bi bi-star"></i> Balcón panorámico</li>
+            </ul>
+
+            <!-- Ruta: RESERVAR junior -->
+            <a href="#" class="btn btn-dark w-100 rounded-pill">Reservar Ahora</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suite Presidencial -->
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card room-card h-100">
+          <img class="room-img"
+               src="https://images.unsplash.com/photo-1505691723518-36a5ac3b2bc5?q=80&w=1200&auto=format&fit=crop"
+               alt="Suite Presidencial" />
+          <div class="card-body">
+            <div class="room-title-line">
+              <h5 class="card-title mb-1">Suite Presidencial</h5>
+              <div class="room-price">$500<small>/noche</small></div>
+            </div>
+
+            <ul class="amenities list-unstyled mb-3">
+              <li><i class="bi bi-star"></i> Dormitorio principal king California</li>
+              <li><i class="bi bi-star"></i> Segundo dormitorio con camas gemelas</li>
+              <li><i class="bi bi-star"></i> Sala de estar (40m²) + comedor 8 personas</li>
+              <li><i class="bi bi-star"></i> Cocina completa premium</li>
+              <li><i class="bi bi-star"></i> Terraza privada con jacuzzi</li>
+              <li><i class="bi bi-star"></i> Vista 360° ciudad y mar</li>
+              <li><i class="bi bi-star"></i> Mayordomo a solicitud</li>
+            </ul>
+
+            <!-- Ruta: RESERVAR presidencial -->
+            <a href="#" class="btn btn-dark w-100 rounded-pill">Reservar Ahora</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+  <footer class="mt-5">
+    <div class="container py-5">
+      <div class="row g-4">
+        <div class="col-12 col-md-3">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-building me-2"></i>
+            <strong>Hotel Elegance</strong>
+          </div>
+          <p class="text-muted small mb-0">Lujo y confort excepcional en el corazón de la ciudad.</p>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Enlaces Rápidos</h6>
+          <ul class="list-unstyled small text-muted">
+            <!-- Reemplaza por tus rutas reales -->
+            <li><a class="link-secondary text-decoration-none" href="#">Inicio</a></li>
+            <li><a class="link-secondary text-decoration-none" href="#">Habitaciones</a></li>
+            <li><a class="link-secondary text-decoration-none" href="#">Servicios</a></li>
+            <li><a class="link-secondary text-decoration-none" href="#">Eventos</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Servicios</h6>
+          <ul class="list-unstyled small text-muted">
+            <li>Restaurante</li>
+            <li>Spa & Wellness</li>
+            <li>Centro de Negocios</li>
+            <li>Eventos</li>
+          </ul>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <h6 class="fw-semibold mb-3">Contacto</h6>
+          <ul class="list-unstyled small text-muted">
+            <li><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</li>
+            <li><i class="bi bi-envelope me-2"></i>info@hotelelegance.com</li>
+            <li><i class="bi bi-geo-alt me-2"></i>Av. Principal 123</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom text-center pt-3 mt-4">
+        <p class="small mb-0">© 2024 Hotel Elegance. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!--
+    JS opcional para marcar activo según URL si usas archivos planos.
+    Si luego pasas a Django, puedes eliminarlo y usar {% if request.resolver_match.url_name == 'habitaciones' %}active{% endif %}
+  -->
+  <script>
+    (function() {
+      const current = (window.location.pathname.replace(/\/+$/,'').split('/').filter(Boolean)[0] || 'habitaciones').toLowerCase();
+      document.querySelectorAll('.navbar .nav-link').forEach(a=>{
+        const r = (a.dataset.route || '').toLowerCase();
+        if (r && r === current) {
+          a.classList.add('active');
+          a.setAttribute('aria-current','page');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

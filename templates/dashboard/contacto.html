@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel Elegance — Contacto</title>
+
+  <!-- Bootstrap 5 + Icons (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --radius: 16px;
+      --brand-dark:#000;
+      --brand-on-dark:#fff;
+    }
+
+    /* Navbar interactiva */
+    .navbar-brand i{ margin-right:.5rem; }
+    .navbar .nav-link{
+      border-radius:999px;
+      padding:.4rem .9rem !important;
+      color:#212529;
+      transition:background-color .15s ease, color .15s ease;
+    }
+    .navbar .nav-link:hover,
+    .navbar .nav-link:focus{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+      text-decoration:none;
+      outline:none;
+    }
+    .navbar .nav-link.active,
+    .navbar .nav-link[aria-current="page"]{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+    }
+
+    /* Encabezado de página */
+    .section-head{
+      text-align:center;
+      margin:2.2rem 0 1.2rem;
+    }
+    .section-head h2{ font-weight:700; }
+    .section-head p{ color:#6c757d; max-width:860px; margin:0 auto; }
+
+    /* Tarjetas suaves reutilizables */
+    .soft-card{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:var(--radius);
+      background:#fff;
+      padding:22px;
+      height:100%;
+    }
+
+    /* Ítems de información de contacto */
+    .contact-item{
+      display:flex; gap:.8rem; align-items:flex-start;
+      margin-bottom:14px;
+    }
+    .contact-item .ci-ico{
+      width:36px; height:36px; border-radius:50%;
+      display:grid; place-items:center; background:#f3f5f8; color:#212a3a;
+      font-size:18px;
+      flex:0 0 36px;
+    }
+    .contact-item .ci-body small{ color:#6c757d; display:block; }
+
+    /* Mapa embebido */
+    .map-wrap{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+
+    /* Footer */
+    footer{
+      background:#f3f4f6;
+      border-top:1px solid rgba(0,0,0,.06);
+    }
+    .footer-bottom{
+      border-top:1px solid rgba(0,0,0,.08);
+      color:#8a93a1;
+      font-size:.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="/">
+        <i class="bi bi-building"></i> Hotel Elegance
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="mainNav" class="collapse navbar-collapse">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/" data-route="inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestras_habitaciones/" data-route="habitaciones">Habitaciones</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestros_servicios/" data-route="servicios">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="/sobre_nosotros/" data-route="nosotros">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/contacto/" data-route="contacto" aria-current="page">Contacto</a></li>
+        </ul>
+        <a class="btn btn-dark btn-sm rounded-3" href="/login/"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ENCABEZADO -->
+  <header class="container">
+    <div class="section-head">
+      <h2>Contacto</h2>
+      <p>Estamos aquí para ayudarte. Contáctanos para cualquier consulta o reservación.</p>
+    </div>
+  </header>
+
+  <!-- CUERPO -->
+  <main class="container pb-5">
+
+    <!-- Fila principal: Información + Horarios -->
+    <div class="row g-4 justify-content-center">
+      <div class="col-12 col-lg-6">
+        <div class="soft-card">
+          <h6 class="fw-semibold mb-3">Información de Contacto</h6>
+
+          <div class="contact-item">
+            <div class="ci-ico"><i class="bi bi-geo-alt"></i></div>
+            <div class="ci-body">
+              <div>Av. Principal 123, Centro Histórico</div>
+              <small>Ciudad, País 12345</small>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="ci-ico"><i class="bi bi-telephone"></i></div>
+            <div class="ci-body">
+              <div>+1 (555) 123-4567</div>
+              <small>Atención 24/7</small>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="ci-ico"><i class="bi bi-envelope"></i></div>
+            <div class="ci-body">
+              <div>info@hotelelegance.com</div>
+              <small>Respuesta en menos de 24h</small>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mt-3">
+            <a class="btn btn-outline-dark btn-sm rounded-3" href="tel:+15551234567"><i class="bi bi-telephone me-1"></i>Llamar</a>
+            <a class="btn btn-dark btn-sm rounded-3" href="mailto:info@hotelelegance.com"><i class="bi bi-envelope me-1"></i>Escribir correo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="soft-card">
+          <h6 class="fw-semibold mb-3">Horarios</h6>
+          <div class="row">
+            <div class="col-6 text-muted">Check-in:</div>
+            <div class="col-6">15:00 - 00:00</div>
+
+            <div class="col-6 text-muted">Check-out:</div>
+            <div class="col-6">07:00 - 12:00</div>
+
+            <div class="col-6 text-muted">Restaurante:</div>
+            <div class="col-6">06:00 - 24:00</div>
+
+            <div class="col-6 text-muted">Gimnasio:</div>
+            <div class="col-6">05:00 - 23:00</div>
+
+            <div class="col-6 text-muted">Spa:</div>
+            <div class="col-6">09:00 - 21:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila secundaria: Formulario + Mapa -->
+    <div class="row g-4 justify-content-center mt-1">
+      <div class="col-12 col-lg-6">
+        <div class="soft-card">
+          <h6 class="fw-semibold mb-3">Envíanos un mensaje</h6>
+
+          <!-- Formulario con validación Bootstrap (front-end) -->
+          <form class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" required>
+                <div class="invalid-feedback">Por favor ingresa tu nombre.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" required>
+                <div class="invalid-feedback">Ingresa un email válido.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Asunto</label>
+                <input type="text" class="form-control" required>
+                <div class="invalid-feedback">Indica un asunto.</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Mensaje</label>
+                <textarea class="form-control" rows="5" required></textarea>
+                <div class="invalid-feedback">Escribe tu mensaje.</div>
+              </div>
+              <div class="col-12 d-flex justify-content-end">
+                <button class="btn btn-dark rounded-3" type="submit">
+                  <i class="bi bi-send me-1"></i> Enviar
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="map-wrap">
+          <!-- Mapa de ejemplo (puedes cambiar la ubicación en el src) -->
+          <div class="ratio ratio-21x9">
+            <iframe
+              src="https://www.google.com/maps?q=Times%20Square%2C%20New%20York&output=embed"
+              allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-5">
+    <div class="container py-5">
+      <div class="row g-4">
+        <div class="col-12 col-md-3">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-building me-2"></i>
+            <strong>Hotel Elegance</strong>
+          </div>
+          <p class="text-muted small mb-0">Lujo y confort excepcional en el corazón de la ciudad.</p>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Enlaces Rápidos</h6>
+          <ul class="list-unstyled small text-muted">
+            <li><a class="link-secondary text-decoration-none" href="/">Inicio</a></li>
+            <li><a class="link-secondary text-decoration-none" href="/nuestras_habitaciones/">Habitaciones</a></li>
+            <li><a class="link-secondary text-decoration-none" href="/nuestros_servicios/">Servicios</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Servicios</h6>
+          <ul class="list-unstyled small text-muted">
+            <li>Restaurante</li>
+            <li>Spa & Wellness</li>
+            <li>Centro de Negocios</li>
+            <li>Eventos</li>
+          </ul>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <h6 class="fw-semibold mb-3">Contacto</h6>
+          <ul class="list-unstyled small text-muted">
+            <li><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</li>
+            <li><i class="bi bi-envelope me-2"></i>info@hotelelegance.com</li>
+            <li><i class="bi bi-geo-alt me-2"></i>Av. Principal 123</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom text-center pt-3 mt-4">
+        <p class="small mb-0">© 2024 Hotel Elegance. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Validación Bootstrap del formulario (front-end) -->
+  <script>
+    (function () {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!form.checkValidity()) {
+            event.preventDefault(); event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })();
+  </script>
+
+  <!-- Marca activo según URL si navegas con archivos planos -->
+  <script>
+    (function() {
+      const current = (window.location.pathname.replace(/\/+$/,'').split('/').filter(Boolean)[0] || 'contacto').toLowerCase();
+      document.querySelectorAll('.navbar .nav-link').forEach(a=>{
+        const r = (a.dataset.route || '').toLowerCase();
+        if (r && r === current) {
+          a.classList.add('active');
+          a.setAttribute('aria-current','page');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
