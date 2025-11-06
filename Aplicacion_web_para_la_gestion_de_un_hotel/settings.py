@@ -40,23 +40,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-
+    'reservas',
     'dashboard',
     'accounts',
     'admin_hotel',
-    'reservas'
 ]
 
 AUTH_USER_MODEL = "accounts.User"
 
-# Lleva a /post-login/ después de iniciar sesión
-LOGIN_REDIRECT_URL = "accounts:post_login"   # <- importante
 
 # Si usas @login_required sin estar logueado:
 LOGIN_URL = "accounts:login"
 
 # Fallback si alguna util necesita una URL por defecto
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "accounts:post_login"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

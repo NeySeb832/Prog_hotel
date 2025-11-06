@@ -30,16 +30,20 @@
 
       {% if messages %}
         {% for m in messages %}
-          <div class="alert alert-danger py-2">{{ m }}</div>
+          <div class="alert alert-{{ m.tags|default:'danger' }} py-2">{{ m }}</div>
         {% endfor %}
       {% endif %}
 
-      <form method="post" class="needs-validation" novalidate>
+      <!-- IMPORTANTE: action al name de la ruta y csrf_token -->
+      <form method="post" action="{% url 'accounts:login' %}" class="needs-validation" autocomplete="off" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next|default:'' }}"/>
+
         <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" name="email" value="{{ identifier|default:'' }}" class="form-control" placeholder="tu@email.com" required>
-          <div class="invalid-feedback">Ingresa tu email.</div>
+          <label class="form-label">Usuario o Email</label>
+          <!-- Tu vista acepta email o username; puedes usar 'email' sin problema -->
+          <input type="text" name="email" value="{{ identifier|default:'' }}" class="form-control" placeholder="usuario o tu@email.com" required>
+          <div class="invalid-feedback">Ingresa tu usuario o email.</div>
         </div>
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
@@ -53,11 +57,10 @@
       </form>
 
       <div class="text-center small mt-2">
-        ¿No tienes una cuenta? <a href="/registro/">Crear cuenta</a>
+        ¿No tienes una cuenta? <a href="{% url 'accounts:registro' %}">Crear cuenta</a>
       </div>
     </div>
 
-    <!-- Opcional, bloque de credenciales demo -->
     <div class="demo-card p-3 mt-3">
       <div class="text-center fw-semibold small mb-2">Credenciales de Demo</div>
       <div class="small"><strong>Administrador:</strong> admin@hotel.com / cualquier-contraseña</div>
@@ -70,11 +73,14 @@
   <script>
     // Mostrar/ocultar contraseña + validación Bootstrap
     (function(){
-      document.getElementById('togglePwd').addEventListener('click', function(){
-        const i = document.getElementById('pwd');
-        i.type = i.type === 'password' ? 'text' : 'password';
-        this.firstElementChild.className = i.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
-      });
+      const toggle = document.getElementById('togglePwd');
+      if (toggle) {
+        toggle.addEventListener('click', function(){
+          const i = document.getElementById('pwd');
+          i.type = i.type === 'password' ? 'text' : 'password';
+          this.firstElementChild.className = i.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        });
+      }
       const forms=document.querySelectorAll('.needs-validation');
       Array.from(forms).forEach(form=>form.addEventListener('submit',e=>{
         if(!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); }

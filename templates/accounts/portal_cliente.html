@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-3">
+
+  <!-- Barra superior -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center gap-2">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width:28px;height:28px;background:#f3f4f6;">
+        <i class="bi bi-person"></i>
+      </div>
+      <div class="fw-semibold">
+        Bienvenida, {{ request.user.first_name|default:request.user.username }}
+      </div>
+      <div class="text-muted small">Habitación {{ estancia_actual.room.number|default:"305" }}</div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <a href="{{ urls.dashboard_home|default:'/' }}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-1"></i> Sitio Web
+      </a>
+      <a href="{{ urls.mis_reservas|default:'#' }}" class="btn btn-light border position-relative">
+        <i class="bi bi-cart"></i> <span class="ms-1">Carrito (0)</span>
+      </a>
+      <a href="{{ urls.logout|default:'/logout/' }}" class="btn btn-light border">
+        <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-light rounded-4 p-1 mb-3">
+    <ul class="nav nav-pills nav-fill" id="tabsPortal" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tab-mis" data-bs-toggle="tab" data-bs-target="#pane-mis" type="button" role="tab">Mis Reservas</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a class="nav-link" id="tab-nueva" href="{{ urls.mis_reservas_nueva|default:'#' }}">Nueva Reserva</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-roomservice" data-bs-toggle="tab" data-bs-target="#pane-roomservice" type="button" role="tab">Room Service</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tab-servicios" data-bs-toggle="tab" data-bs-target="#pane-servicios" type="button" role="tab">Servicios</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row g-3">
+
+    <!-- Columna izquierda -->
+    <div class="col-12 col-lg-4">
+      <!-- Mi Perfil -->
+      <div class="card shadow-sm rounded-4 mb-3">
+        <div class="card-body">
+          <h6 class="mb-3">Mi Perfil</h6>
+          <div class="small">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-person"></i>
+              <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="bi bi-telephone"></i>
+              <span>+1 (555) 123-4567</span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-geo-alt"></i>
+              <span>Calle Principal 456, Ciudad</span>
+            </div>
+
+            <div class="border-top pt-3 mb-3">
+              <div class="text-muted">Estancia Actual</div>
+              {% if estancia_actual %}
+                <div>Habitación {{ estancia_actual.room.number }}</div>
+                <div class="text-muted">Suite Junior</div>
+                <div class="text-muted">Check-out: {{ estancia_actual.check_out }}</div>
+              {% else %}
+                <div class="text-muted">Sin estancia activa.</div>
+              {% endif %}
+            </div>
+
+            <div class="border-top pt-3">
+              <div class="text-muted">Estadísticas</div>
+              <div>Reservaciones: {{ reservas|length }}</div>
+              <div>Noches totales: {{ noches_totales }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solicitudes de Servicio -->
+      <div class="card shadow-sm rounded-4">
+        <div class="card-body">
+          <h6 class="mb-3">Solicitudes de Servicio</h6>
+          <div class="small">
+            {% for s in solicitudes_servicio %}
+              <div class="d-flex justify-content-between align-items-center py-2">
+                <div>
+                  <div class="fw-semibold">{{ s.titulo }}</div>
+                  <div class="text-muted">{{ s.hora }}</div>
+                </div>
+                <span class="badge {% if s.estado == 'Confirmado' %}text-bg-light border{% else %}text-bg-light border{% endif %}">
+                  {{ s.estado }}
+                </span>
+              </div>
+              {% if not forloop.last %}<hr class="my-1">{% endif %}
+            {% empty %}
+              <div class="text-muted">No hay solicitudes.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="col-12 col-lg-8">
+      <div class="tab-content" id="tabsPortalContent">
+
+        <!-- Mis Reservas -->
+        <div class="tab-pane fade show active" id="pane-mis" role="tabpanel">
+          <div class="mb-2 fw-semibold">Mis Reservaciones</div>
+
+          {% for r in reservas %}
+            <div class="card rounded-4 shadow-sm mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <div class="fw-semibold">Hotel Elegance</div>
+                    <div class="text-muted small">
+                      {{ r.room.room_type.name|default:"Habitación Estándar" }}
+                    </div>
+                  </div>
+
+                  <!-- Badge de estado -->
+                  {% with st=r.status %}
+                    {% if st == 'CHECKED_IN' %}
+                      <span class="badge rounded-pill text-bg-light border">Activa (Hospedado)</span>
+                    {% elif st == 'BOOKED' %}
+                      <span class="badge rounded-pill text-bg-dark">Confirmada</span>
+                    {% elif st == 'CANCELLED' %}
+                      <span class="badge rounded-pill text-bg-secondary">Cancelada</span>
+                    {% else %}
+                      <span class="badge rounded-pill text-bg-light border">Pendiente</span>
+                    {% endif %}
+                  {% endwith %}
+                </div>
+
+                <!-- Grid de info -->
+                <div class="row row-cols-2 row-cols-md-4 gy-2 small">
+                  <div>
+                    <div class="text-muted">Check-in</div>
+                    <div>{{ r.check_in }}</div>
+                  </div>
+                  <div>
+                    <div class="text-muted">Check-out</div>
+                    <div>{{ r.check_out }}</div>
+                  </div>
+                  <div>
+                    <div class="text-muted">Huéspedes</div>
+                    <div>{{ r.pax_adults|default:0|add:r.pax_children|default:0 }}</div>
+                  </div>
+                  <div>
+                    <div class="text-muted">Total</div>
+                    <div>${{ r.total|default:'0' }}</div>
+                  </div>
+                </div>
+
+                {% if r.room.number %}
+                  <div class="mt-2 small">Habitación asignada: <span class="fw-semibold">{{ r.room.number }}</span></div>
+                {% endif %}
+
+                <div class="mt-3 d-flex gap-2">
+                  <a class="btn btn-outline-secondary btn-sm" href="{% url 'reservas:mis_reservas_detalle' r.pk %}">Ver detalle</a>
+                  <a class="btn btn-outline-primary btn-sm" href="{% url 'reservas:mis_reservas_editar' r.pk %}">Modificar</a>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-muted">Aún no tienes reservaciones.</div>
+          {% endfor %}
+        </div>
+
+        <!-- Room Service -->
+        <div class="tab-pane fade" id="pane-roomservice" role="tabpanel">
+          <h6 class="mb-3">Room Service</h6>
+          <p class="text-muted small">Solicita limpieza, toallas, lavandería, etc. (próximamente).</p>
+          <a class="btn btn-dark btn-sm" href="#">Nueva solicitud</a>
+        </div>
+
+        <!-- Servicios -->
+        <div class="tab-pane fade" id="pane-servicios" role="tabpanel">
+          <h6 class="mb-3">Servicios</h6>
+          <ul class="list-group small">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Spa & Wellness
+              <a href="#" class="btn btn-outline-dark btn-sm">Reservar</a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Restaurante
+              <a href="#" class="btn btn-outline-dark btn-sm">Ver menú</a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Tours locales
+              <a href="#" class="btn btn-outline-dark btn-sm">Explorar</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .nav-pills .nav-link{border-radius:999px;}
+  .card{border:0;}
+  .badge{font-weight:600;}
+</style>
+
+<script>
+  // Persistir pestaña activa entre recargas
+  (function(){
+    const tabs = document.getElementById('tabsPortal');
+    if(!tabs) return;
+    const key='portal_tab';
+    const saved=localStorage.getItem(key);
+    if(saved){
+      const trigger=tabs.querySelector(`[data-bs-target="${saved}"]`);
+      if(trigger) new bootstrap.Tab(trigger).show();
+    }
+    tabs.addEventListener('shown.bs.tab', ev=>{
+      const t=ev.target.getAttribute('data-bs-target');
+      if(t) localStorage.setItem(key,t);
+    });
+  })();
+</script>
+{% endblock %}

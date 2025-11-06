@@ -1,12 +1,16 @@
-# accounts/urls.py
-from django.urls import path  # 👈 IMPORTANTE
-from .views import CustomLoginView, RegisterPageView, PostLoginView, logout_view
+from django.urls import path
+from .views import (
+    CustomLoginView,
+    RegisterPageView,
+    logout_view,
+    ClientPortalView,
+)
 
 app_name = "accounts"
 
 urlpatterns = [
-    path("login/", CustomLoginView.as_view(), name="Login"),
-    path("registro/", RegisterPageView.as_view(), name="registro"),
-    path("post-login/", PostLoginView.as_view(), name="post_login"),
-    path("logout/", logout_view, name="logout"),
+    path("login/",     CustomLoginView.as_view(),  name="login"),
+    path("registro/",  RegisterPageView.as_view(), name="registro"),
+    path("logout/",    logout_view,                name="logout"),
+    path("mi-portal/", ClientPortalView.as_view(), name="portal_cliente"),
 ]

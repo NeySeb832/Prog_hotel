@@ -15,17 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+# Aplicacion_web_para_la_gestion_de_un_hotel/urls.py
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
+from django.urls import reverse_lazy
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
-    # Modulos del sistema
+    # Raíz del sitio -> módulo "dashboard" (bienvenida)
     path("", include("dashboard.urls")),
 
-    path("", include("accounts.urls")),
-
-    path("", include("admin_hotel.urls")),
+    # Apps
+    path("", include("accounts.urls")),           # /login, /registro, /mi-portal
+    path("reservas/", include("reservas.urls")),  # /reservas/...
+    path("admin_hotel/", include("admin_hotel.urls")),
 
 ]
