@@ -1,0 +1,50 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}Eliminar cliente · HotelManager{% endblock %}
+{% block page_title %}Eliminar cliente{% endblock %}
+{% block page_subtitle %}
+  Confirma la eliminación del cliente. Las reservas históricas conservarán los datos básicos del huésped.
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <p>
+          Vas a eliminar al siguiente cliente:
+        </p>
+        <p class="fw-semibold">
+          {% if cliente.get_full_name %}
+            {{ cliente.get_full_name }}
+          {% else %}
+            {{ cliente.username }}
+          {% endif %}
+        </p>
+        {% if cliente.email %}
+          <p class="text-muted small mb-2">
+            {{ cliente.email }}
+          </p>
+        {% endif %}
+
+        <p class="small text-muted">
+          Las reservas asociadas no se eliminarán: el campo "usuario" de la reserva quedará vacío,
+          pero se conservarán el nombre, email y teléfono del huésped almacenados en cada reserva.
+        </p>
+
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+              Sí, eliminar cliente
+            </button>
+            <a href="{% url 'clientes:detalle' cliente.pk %}" class="btn btn-light">
+              Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotel Elegance — Sobre Nosotros</title>
+
+  <!-- Bootstrap 5 + Icons (CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --radius: 16px;
+      --brand-dark:#000;
+      --brand-on-dark:#fff;
+    }
+
+    /* Navbar interactiva */
+    .navbar-brand i{ margin-right:.5rem; }
+    .navbar .nav-link{
+      border-radius:999px;
+      padding:.4rem .9rem !important;
+      color:#212529;
+      transition:background-color .15s ease, color .15s ease;
+    }
+    .navbar .nav-link:hover,
+    .navbar .nav-link:focus{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+      text-decoration:none;
+      outline:none;
+    }
+    .navbar .nav-link.active,
+    .navbar .nav-link[aria-current="page"]{
+      background-color:var(--brand-dark);
+      color:var(--brand-on-dark) !important;
+    }
+
+    /* Encabezado */
+    .section-head{
+      text-align:center;
+      margin:2.2rem 0 1.2rem;
+    }
+    .section-head h2{ font-weight:700; }
+    .section-head p{ color:#6c757d; max-width:900px; margin:0 auto; }
+
+    /* Tarjetas suaves reutilizables */
+    .soft-card{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:var(--radius);
+      background:#fff;
+      padding:22px;
+    }
+
+    /* Valores */
+    .value-item{
+      text-align:center;
+      padding:24px 18px;
+      border:1px solid rgba(0,0,0,.08);
+      border-radius:var(--radius);
+      background:#fff;
+      height:100%;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .value-item:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 22px rgba(0,0,0,.06);
+    }
+    .value-icon{
+      width:48px; height:48px;
+      display:grid; place-items:center;
+      border-radius:50%;
+      background:#f3f5f8;
+      margin:0 auto 10px auto;
+      font-size:22px; color:#212a3a;
+    }
+    .value-title{ font-weight:600; margin-bottom:4px; }
+
+    /* Línea de tiempo */
+    .timeline{
+      position:relative;
+      padding-left:28px;
+    }
+    .timeline::before{
+      content:"";
+      position:absolute; left:12px; top:0; bottom:0;
+      width:2px; background:#e7e9ee;
+    }
+    .t-item{
+      position:relative;
+      margin-bottom:18px;
+    }
+    .t-item:last-child{ margin-bottom:0; }
+    .t-dot{
+      position:absolute; left:-2px; top:6px;
+      width:10px; height:10px; border-radius:50%; background:#0d6efd;
+      box-shadow:0 0 0 4px #eaf1ff;
+    }
+    .t-year{ font-weight:700; margin-bottom:4px; }
+    .t-text{ color:#6c757d; margin:0; }
+
+    /* Métricas */
+    .kpi{
+      text-align:center;
+      padding:18px 10px;
+    }
+    .kpi .num{
+      font-size:2rem; font-weight:800; line-height:1;
+    }
+    .kpi .sub{ color:#6c757d; }
+
+    /* Footer */
+    footer{
+      background:#f3f4f6;
+      border-top:1px solid rgba(0,0,0,.06);
+    }
+    .footer-bottom{
+      border-top:1px solid rgba(0,0,0,.08);
+      color:#8a93a1;
+      font-size:.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="/">
+        <i class="bi bi-building"></i> Hotel Elegance
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div id="mainNav" class="collapse navbar-collapse">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/" data-route="inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestras_habitaciones/" data-route="habitaciones">Habitaciones</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestros_servicios/" data-route="servicios">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/sobre_nosotros/" data-route="nosotros" aria-current="page">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contacto" data-route="contacto">Contacto</a></li>
+        </ul>
+        <a class="btn btn-dark btn-sm rounded-3" href="#"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ENCABEZADO -->
+  <header class="container">
+    <div class="section-head">
+      <h2>Sobre Nosotros</h2>
+      <p>
+        Hotel Elegance es un establecimiento de lujo que combina la tradición hotelera con las comodidades
+        modernas. Desde 1985, diseñamos experiencias memorables para viajeros de negocios y placer, con
+        un servicio cercano y auténtico.
+      </p>
+    </div>
+  </header>
+
+  <!-- MISIÓN & VISIÓN -->
+  <section class="container pb-2">
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="soft-card h-100">
+          <h6 class="fw-semibold mb-2">Nuestra Misión</h6>
+          <p class="text-muted mb-0">
+            Brindar hospitalidad excepcional que supere las expectativas de nuestros huéspedes, con
+            confort, estilo y atención personalizada que conviertan cada visita en un recuerdo inolvidable.
+          </p>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="soft-card h-100">
+          <h6 class="fw-semibold mb-2">Nuestra Visión</h6>
+          <p class="text-muted mb-0">
+            Ser el hotel de referencia en la región por innovación, sostenibilidad y servicio cálido,
+            contribuyendo al desarrollo del turismo responsable.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALORES -->
+  <section class="container py-3">
+    <div class="soft-card">
+      <h6 class="fw-semibold mb-3">Nuestros Valores</h6>
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="value-item">
+            <div class="value-icon"><i class="bi bi-award"></i></div>
+            <div class="value-title">Excelencia</div>
+            <p class="text-muted small mb-0">Cuidado por el detalle en cada servicio.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="value-item">
+            <div class="value-icon"><i class="bi bi-shield-check"></i></div>
+            <div class="value-title">Integridad</div>
+            <p class="text-muted small mb-0">Honestidad y transparencia.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="value-item">
+            <div class="value-icon"><i class="bi bi-stars"></i></div>
+            <div class="value-title">Innovación</div>
+            <p class="text-muted small mb-0">Mejora continua y tecnología útil.</p>
+          </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="value-item">
+            <div class="value-icon"><i class="bi bi-emoji-smile"></i></div>
+            <div class="value-title">Hospitalidad</div>
+            <p class="text-muted small mb-0">Calidez humana y cercanía.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORIA (línea de tiempo) + MÉTRICAS -->
+  <section class="container pb-5">
+    <div class="row g-4">
+      <div class="col-12 col-lg-7">
+        <div class="soft-card h-100">
+          <h6 class="fw-semibold mb-3">Nuestra Historia</h6>
+          <div class="timeline">
+            <div class="t-item">
+              <span class="t-dot"></span>
+              <div class="t-year">1985</div>
+              <p class="t-text">Apertura del primer edificio con 40 habitaciones en el centro de la ciudad.</p>
+            </div>
+            <div class="t-item">
+              <span class="t-dot"></span>
+              <div class="t-year">1998</div>
+              <p class="t-text">Expansión a 120 habitaciones e incorporación de salones para eventos.</p>
+            </div>
+            <div class="t-item">
+              <span class="t-dot"></span>
+              <div class="t-year">2012</div>
+              <p class="t-text">Renovación completa: nuevas suites, spa y gimnasio.</p>
+            </div>
+            <div class="t-item">
+              <span class="t-dot"></span>
+              <div class="t-year">2023</div>
+              <p class="t-text">Estrategia de sostenibilidad: eficiencia energética y programas locales.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="soft-card h-100">
+          <h6 class="fw-semibold mb-3">En Números</h6>
+          <div class="row text-center">
+            <div class="col-6 kpi">
+              <div class="num">35+</div>
+              <div class="sub">Años de servicio</div>
+            </div>
+            <div class="col-6 kpi">
+              <div class="num">98%</div>
+              <div class="sub">Satisfacción</div>
+            </div>
+            <div class="col-6 kpi">
+              <div class="num">10</div>
+              <div class="sub">Salones de eventos</div>
+            </div>
+            <div class="col-6 kpi">
+              <div class="num">180</div>
+              <div class="sub">Habitaciones y suites</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="mt-5">
+    <div class="container py-5">
+      <div class="row g-4">
+        <div class="col-12 col-md-3">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-building me-2"></i>
+            <strong>Hotel Elegance</strong>
+          </div>
+          <p class="text-muted small mb-0">Lujo y confort excepcional en el corazón de la ciudad.</p>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Enlaces Rápidos</h6>
+          <ul class="list-unstyled small text-muted">
+            <li><a class="link-secondary text-decoration-none" href="#">Inicio</a></li>
+            <li><a class="link-secondary text-decoration-none" href="#">Habitaciones</a></li>
+            <li><a class="link-secondary text-decoration-none" href="#">Servicios</a></li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <h6 class="fw-semibold mb-3">Servicios</h6>
+          <ul class="list-unstyled small text-muted">
+            <li>Restaurante</li>
+            <li>Spa & Wellness</li>
+            <li>Centro de Negocios</li>
+            <li>Eventos</li>
+          </ul>
+        </div>
+
+        <div class="col-12 col-md-3">
+          <h6 class="fw-semibold mb-3">Contacto</h6>
+          <ul class="list-unstyled small text-muted">
+            <li><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</li>
+            <li><i class="bi bi-envelope me-2"></i>info@hotelelegance.com</li>
+            <li><i class="bi bi-geo-alt me-2"></i>Av. Principal 123</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom text-center pt-3 mt-4">
+        <p class="small mb-0">© 2024 Hotel Elegance. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script opcional para marcar activo cuando navegues con archivos planos -->
+  <script>
+    (function() {
+      const current = (window.location.pathname.replace(/\/+$/,'').split('/').filter(Boolean)[0] || 'nosotros').toLowerCase();
+      document.querySelectorAll('.navbar .nav-link').forEach(a=>{
+        const r = (a.dataset.route || '').toLowerCase();
+        if (r && r === current) {
+          a.classList.add('active');
+          a.setAttribute('aria-current','page');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

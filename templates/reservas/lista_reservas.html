@@ -1,0 +1,713 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Reservas · HotelManager{% endblock %}
+
+{% block extra_head %}
+<style>
+  .reserva-card {
+    border-radius: .75rem;
+    border: 1px solid rgba(0,0,0,.05);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+  }
+  .table-reservas th,
+  .table-reservas td {
+    vertical-align: middle;
+  }
+
+  .badge-estado {
+    font-size: .75rem;
+    border-radius: 999px;
+    padding: .2rem .6rem;
+    font-weight: 500;
+  }
+  .badge-estado-pending { background: #fee2e2; color: #b91c1c; }
+  .badge-estado-confirmed { background: #e0f2fe; color: #1d4ed8; }
+  .badge-estado-checked_in { background: #dcfce7; color: #15803d; }
+  .badge-estado-checked_out { background: #e5e7eb; color: #374151; }
+  .badge-estado-cancelled { background: #f3f4f6; color: #6b7280; }
+
+  .badge-pago {
+    font-size: .75rem;
+    border-radius: 999px;
+    padding: .2rem .6rem;
+    font-weight: 500;
+  }
+  .badge-pago-pendiente { background: #fef3c7; color: #92400e; }
+  .badge-pago-parcial { background: #e0f2fe; color: #1d4ed8; }
+  .badge-pago-completo { background: #dcfce7; color: #166534; }
+
+  .modal-card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 20px 40px rgba(15,23,42,0.15);
+  }
+
+  .muted { color: #6b7280; }
+</style>
+{% endblock %}
+
+{% block page_title %}Reservas{% endblock %}
+{% block page_subtitle %}Gestión completa de reservas del hotel{% endblock %}
+
+{% block content %}
+
+{# Barra superior: filtros independientes + botón Nueva Reserva #}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+  <form method="get" class="flex-grow-1">
+    <div class="row g-2">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text"
+                 class="form-control border-start-0"
+                 name="q"
+                 placeholder="Buscar por nombre, ID de reserva o habitación..."
+                 value="{{ request.GET.q }}">
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <select class="form-select" name="status" onchange="this.form.submit()">
+          <option value="">Todos los estados</option>
+          {% for value, label in status_choices %}
+            <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <select class="form-select" name="guest" onchange="this.form.submit()">
+          <option value="">Todos los huéspedes</option>
+          {% for c in clientes %}
+            <option value="{{ c.id }}" {% if request.GET.guest == c.id|stringformat:"s" %}selected{% endif %}>
+              {% if c.get_full_name %}{{ c.get_full_name }}{% else %}{{ c.username }}{% endif %}
+              {% if c.email %} ({{ c.email }}){% endif %}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <select class="form-select" name="room" onchange="this.form.submit()">
+          <option value="">Todas las habitaciones</option>
+          {% for h in habitaciones %}
+            <option value="{{ h.id }}" {% if request.GET.room == h.id|stringformat:"s" %}selected{% endif %}>
+              Hab {{ h.codigo }} · Piso {{ h.piso }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <div class="text-md-end mt-2 mt-md-0">
+    <button class="btn btn-dark" type="button" data-bs-toggle="modal" data-bs-target="#modalNuevaReserva">
+      <i class="bi bi-plus-lg"></i> Nueva Reserva
+    </button>
+  </div>
+</div>
+
+{# Card principal de reservas #}
+<div class="reserva-card p-3">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <h6 class="mb-0">Reservas activas</h6>
+      <small class="text-muted">
+        {{ reservas|length }} reservas encontradas
+      </small>
+    </div>
+    <div class="text-end small text-muted">
+      Total: {{ kpis.total }} · Pendientes: {{ kpis.pendientes }} · Confirmadas: {{ kpis.confirmadas }} · En curso: {{ kpis.en_curso }}
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-borderless align-middle table-reservas mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Huésped</th>
+          <th>Habitación</th>
+          <th>Fechas</th>
+          <th>Huéspedes</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Pago</th>
+          <th class="text-end">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reservas %}
+        <tr>
+          <td><strong>{{ r.code }}</strong></td>
+
+          <td>
+            <div class="fw-semibold">{{ r.guest_name }}</div>
+            {% if r.guest_email %}
+              <div class="small text-muted">{{ r.guest_email }}</div>
+            {% endif %}
+          </td>
+
+          <td>
+            <div class="fw-semibold">{{ r.room.codigo }}</div>
+            <div class="small text-muted">
+              {% if r.room.tipo %}
+                {{ r.room.tipo.nombre }}
+              {% endif %}
+            </div>
+          </td>
+
+          <td>
+            <div class="small">
+              {{ r.check_in }} &rarr; {{ r.check_out }}
+            </div>
+            <div class="small text-muted">
+              {{ r.nights }} noche{% if r.nights != 1 %}s{% endif %}
+            </div>
+          </td>
+
+          <td>
+            {{ r.adults|default:0 }} ad.
+            {% if r.children %} · {{ r.children }} niñ.@{% endif %}
+          </td>
+
+          <td>
+            ${{ r.total_amount|default:"0" }}
+          </td>
+
+          <td>
+            {% if r.status == 'PENDING' %}
+              <span class="badge-estado badge-estado-pending">pendiente</span>
+            {% elif r.status == 'CONFIRMED' %}
+              <span class="badge-estado badge-estado-confirmed">confirmada</span>
+            {% elif r.status == 'CHECKED_IN' %}
+              <span class="badge-estado badge-estado-checked_in">en curso</span>
+            {% elif r.status == 'CHECKED_OUT' %}
+              <span class="badge-estado badge-estado-checked_out">finalizada</span>
+            {% elif r.status == 'CANCELLED' %}
+              <span class="badge-estado badge-estado-cancelled">cancelada</span>
+            {% else %}
+              <span class="badge-estado">n/d</span>
+            {% endif %}
+          </td>
+
+          <td>
+            {% if r.paid_amount == 0 %}
+              <span class="badge-pago badge-pago-pendiente">pendiente</span>
+            {% elif r.paid_amount >= r.total_amount %}
+              <span class="badge-pago badge-pago-completo">pagado</span>
+            {% else %}
+              <span class="badge-pago badge-pago-parcial">parcial</span>
+            {% endif %}
+          </td>
+
+          <td class="text-end">
+            <div class="btn-group" role="group">
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Ver detalle"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalDetalle-{{ r.pk }}">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Editar reserva"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalEditar-{{ r.pk }}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Procesar pago"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalPago-{{ r.pk }}">
+                <i class="bi bi-currency-dollar"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9" class="text-center text-muted py-4">
+            No hay reservas registradas todavía.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block modals %}
+
+{# --- Modal: Nueva Reserva --- #}
+<div class="modal fade" id="modalNuevaReserva" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content modal-card"
+          method="post"
+          action="{% url 'reservas:api_crear' %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title">Nueva Reserva</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6>Huésped</h6>
+
+            <div class="mb-2">
+              <label class="form-label">Cliente registrado (opcional)</label>
+              <select name="guest_id" id="select-guest" class="form-select">
+                <option value="">-- Seleccionar cliente registrado --</option>
+                {% for c in clientes %}
+                  <option value="{{ c.id }}"
+                          data-name="{% if c.get_full_name %}{{ c.get_full_name }}{% else %}{{ c.username }}{% endif %}"
+                          data-email="{{ c.email }}"
+                          data-phone="{{ c.phone }}">
+                    {% if c.get_full_name %}{{ c.get_full_name }}{% else %}{{ c.username }}{% endif %} ({{ c.email }})
+                  </option>
+                {% endfor %}
+              </select>
+              <small class="text-muted">
+                Si el huésped ya está registrado, selecciónalo para rellenar los datos automáticamente.
+              </small>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label">Nombre del huésped</label>
+              <input type="text" name="guest_name" class="form-control">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input type="email" name="guest_email" class="form-control">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Teléfono</label>
+              <input type="text" name="guest_phone" class="form-control">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <h6>Estancia</h6>
+            <div class="mb-2">
+              <label class="form-label">Habitación</label>
+              <select name="room_id" class="form-select" required>
+                <option value="">Seleccione habitación…</option>
+                {% for h in habitaciones %}
+                  <option value="{{ h.id }}"
+                          data-capacity="{% if h.tipo %}{{ h.tipo.capacidad }}{% endif %}">
+                    Hab {{ h.codigo }} · Piso {{ h.piso }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label">Check-in</label>
+                <input type="date" name="check_in" class="form-control" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Check-out</label>
+                <input type="date" name="check_out" class="form-control" required>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">Adultos</label>
+                <input type="number" name="adults" class="form-control" min="1" value="1">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Niños</label>
+                <input type="number" name="children" class="form-control" min="0" value="0">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-dark">Crear reserva</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# --- Modales por reserva: Detalle, Editar, Pago --- #}
+{% for r in reservas %}
+
+{# Modal Detalle #}
+<div class="modal fade" id="modalDetalle-{{ r.pk }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content modal-card">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title">Detalles de Reserva · {{ r.code }}</h5>
+          <small class="text-muted">Información completa de la reserva</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <div class="border rounded-3 p-3 h-100">
+              <h6>Información del Huésped</h6>
+              <div class="small">
+                <div><strong>Nombre:</strong> {{ r.guest_name }}</div>
+                {% if r.guest_email %}
+                  <div><strong>Email:</strong> {{ r.guest_email }}</div>
+                {% endif %}
+                {% if r.guest_phone %}
+                  <div><strong>Teléfono:</strong> {{ r.guest_phone }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="border rounded-3 p-3 h-100">
+              <h6>Detalles de Estancia</h6>
+              <div class="small">
+                <div><strong>Habitación:</strong> {{ r.room.codigo }}
+                  {% if r.room.tipo %}- {{ r.room.tipo.nombre }}{% endif %}
+                </div>
+                <div><strong>Check-in:</strong> {{ r.check_in }}</div>
+                <div><strong>Check-out:</strong> {{ r.check_out }}</div>
+                <div><strong>Huéspedes:</strong> {{ r.adults }} adultos{% if r.children %}, {{ r.children }} niños{% endif %}</div>
+                <div><strong>Noches:</strong> {{ r.nights }}</div>
+                <div><strong>Estado habitación:</strong> {{ r.room.get_estado_display }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded-3 p-3">
+          <h6>Información Financiera</h6>
+          <div class="row small">
+            <div class="col-md-4">
+              <strong>Tarifa por noche:</strong> ${{ r.base_rate|default:"0" }}
+            </div>
+            <div class="col-md-4">
+              <strong>Noches:</strong> {{ r.nights }}
+            </div>
+            <div class="col-md-4">
+              <strong>Total estimado:</strong> ${{ r.total_amount|default:"0" }}
+            </div>
+          </div>
+          <div class="row small mt-2">
+            <div class="col-md-4">
+              <strong>Pagado:</strong> ${{ r.paid_amount|default:"0" }}
+            </div>
+            <div class="col-md-4">
+              <strong>Saldo pendiente:</strong> ${{ r.pending_amount|default:"0" }}
+            </div>
+          </div>
+          {% if r.notes %}
+            <div class="small mt-2">
+              <strong>Notas:</strong> {{ r.notes }}
+            </div>
+          {% endif %}
+        </div>
+
+        {# NUEVO: listado de pagos / facturas #}
+        <div class="border rounded-3 p-3 mt-3">
+          <h6>Pagos registrados / Facturas</h6>
+          {% if r.payments.count %}
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Factura</th>
+                    <th>Método</th>
+                    <th>Monto</th>
+                    <th>Referencia</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in r.payments.all %}
+                    <tr>
+                      <td class="small">
+                        {{ p.created_at|date:"Y-m-d H:i" }}
+                      </td>
+                      <td>
+                        <span class="fw-semibold">{{ p.invoice_number }}</span>
+                      </td>
+                      <td class="small">
+                        {{ p.get_method_display }}
+                      </td>
+                      <td>
+                        <strong>${{ p.amount }}</strong>
+                      </td>
+                      <td class="small">
+                        {% if p.reference %}
+                          {{ p.reference }}
+                        {% else %}
+                          <span class="text-muted">—</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end">
+                        <a href="{% url 'reservas:pago_factura' p.pk %}"
+                           target="_blank"
+                           class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-file-earmark-pdf"></i> Ver factura
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="small text-muted">
+              No hay pagos registrados para esta reserva.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <form method="post" action="{% url 'reservas:api_estado' r.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel">
+          <button type="submit" class="btn btn-outline-danger"
+                  {% if r.status == 'CANCELLED' or r.status == 'CHECKED_OUT' %}disabled{% endif %}>
+            Cancelar reserva
+          </button>
+        </form>
+
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                data-bs-toggle="modal" data-bs-target="#modalEditar-{{ r.pk }}">
+          Modificar
+        </button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                data-bs-toggle="modal" data-bs-target="#modalPago-{{ r.pk }}">
+          Procesar pago
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Modal Editar #}
+<div class="modal fade" id="modalEditar-{{ r.pk }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content modal-card"
+          method="post"
+          action="{% url 'reservas:api_editar' r.pk %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title">Editar Reserva · {{ r.code }}</h5>
+          <small class="text-muted">Modificar los datos de la reserva</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6>Huésped</h6>
+            <div class="mb-2">
+              <label class="form-label">Nombre del huésped</label>
+              <input type="text" name="guest_name" class="form-control" value="{{ r.guest_name }}" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input type="email" name="guest_email" class="form-control" value="{{ r.guest_email }}">
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Teléfono</label>
+              <input type="text" name="guest_phone" class="form-control" value="{{ r.guest_phone }}">
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <h6>Estancia</h6>
+            <div class="mb-2">
+              <label class="form-label">Habitación</label>
+              <input type="text" class="form-control"
+                     value="Hab {{ r.room.codigo }}{% if r.room.tipo %} · {{ r.room.tipo.nombre }}{% endif %}" disabled>
+              <div class="small text-muted">El cambio de habitación se gestiona desde Operaciones.</div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label">Check-in</label>
+                <input type="date" name="check_in" class="form-control" value="{{ r.check_in|date:'Y-m-d' }}" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Check-out</label>
+                <input type="date" name="check_out" class="form-control" value="{{ r.check_out|date:'Y-m-d' }}" required>
+              </div>
+            </div>
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label">Adultos</label>
+                <input type="number" name="adults" class="form-control" min="1" value="{{ r.adults }}">
+              </div>
+              <div class="col-6">
+                <label class="form-label">Niños</label>
+                <input type="number" name="children" class="form-control" min="0" value="{{ r.children }}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-warning">Guardar cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{# Modal Pago #}
+<div class="modal fade" id="modalPago-{{ r.pk }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content modal-card"
+          method="post"
+          action="{% url 'reservas:api_pago' r.pk %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title">Procesar Pago · {{ r.code }}</h5>
+          <small class="text-muted">Registrar el pago de la reserva</small>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="border rounded-3 p-3 mb-3">
+          <div class="row small">
+            <div class="col-md-4">
+              <strong>Huésped:</strong> {{ r.guest_name }}
+            </div>
+            <div class="col-md-4">
+              <strong>Habitación:</strong> {{ r.room.codigo }}
+            </div>
+            <div class="col-md-4">
+              <strong>Total reserva:</strong> ${{ r.total_amount|default:"0" }}
+            </div>
+          </div>
+          <div class="row small mt-1">
+            <div class="col-md-4">
+              <strong>Pagado:</strong> ${{ r.paid_amount|default:"0" }}
+            </div>
+            <div class="col-md-4">
+              <strong>Saldo pendiente:</strong> ${{ r.pending_amount|default:"0" }}
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Monto a cobrar ahora</label>
+          <input type="number" name="amount" step="0.01" min="0.01"
+                 value="{{ r.pending_amount|default:'0' }}"
+                 class="form-control" required>
+          <small class="text-muted">
+            No se permite registrar un monto mayor al saldo pendiente.
+          </small>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Método de pago</label>
+          <select name="method" class="form-select">
+            <option value="CASH">Efectivo</option>
+            <option value="CARD">Tarjeta</option>
+            <option value="TRANSFER">Transferencia</option>
+            <option value="OTHER">Otro</option>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Referencia / Notas</label>
+          <input type="text" name="reference" class="form-control" placeholder="Número de transacción, notas...">
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Comentarios internos (opcional)</label>
+          <textarea name="notes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-success">Confirmar pago</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endfor %}
+
+{# JS para autocompletar datos del huésped y validar capacidad #}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const guestSelect = document.getElementById("select-guest");
+  if (guestSelect) {
+    guestSelect.addEventListener("change", function() {
+      const opt = this.selectedOptions[0];
+      if (!opt) return;
+      const name = opt.getAttribute("data-name") || "";
+      const email = opt.getAttribute("data-email") || "";
+      const phone = opt.getAttribute("data-phone") || "";
+
+      const modal = document.getElementById("modalNuevaReserva");
+      if (!modal) return;
+
+      const nameInput = modal.querySelector("input[name='guest_name']");
+      const emailInput = modal.querySelector("input[name='guest_email']");
+      const phoneInput = modal.querySelector("input[name='guest_phone']");
+
+      if (name && nameInput) nameInput.value = name;
+      if (email && emailInput) emailInput.value = email;
+      if (phone && phoneInput) phoneInput.value = phone;
+    });
+  }
+
+  function validateCapacity() {
+    const modal = document.getElementById("modalNuevaReserva");
+    if (!modal) return;
+
+    const roomSelect = modal.querySelector("select[name='room_id']");
+    const adultsInput = modal.querySelector("input[name='adults']");
+    const childrenInput = modal.querySelector("input[name='children']");
+
+    if (!roomSelect || !adultsInput || !childrenInput) return;
+
+    const opt = roomSelect.selectedOptions[0];
+    const capacity = opt ? parseInt(opt.getAttribute("data-capacity") || "0", 10) : 0;
+    if (!capacity) return; // si no hay capacidad definida, no validamos aquí
+
+    const adults = parseInt(adultsInput.value || "0", 10);
+    const children = parseInt(childrenInput.value || "0", 10);
+    if ((adults + children) > capacity) {
+      alert("El número de huéspedes supera la capacidad máxima de la habitación (" + capacity + ").");
+    }
+  }
+
+  const modal = document.getElementById("modalNuevaReserva");
+  if (modal) {
+    const roomSelect = modal.querySelector("select[name='room_id']");
+    const adultsInput = modal.querySelector("input[name='adults']");
+    const childrenInput = modal.querySelector("input[name='children']");
+
+    if (roomSelect) roomSelect.addEventListener("change", validateCapacity);
+    if (adultsInput) adultsInput.addEventListener("change", validateCapacity);
+    if (childrenInput) childrenInput.addEventListener("change", validateCapacity);
+  }
+});
+</script>
+
+{% endblock %}

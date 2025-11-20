@@ -1,0 +1,53 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}Confirmar check-out{% endblock %}
+{% block page_title %}Confirmar check-out{% endblock %}
+{% block page_subtitle %}
+  Habitación {{ estadia.habitacion }} · Reserva {{ estadia.reserva.code }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+  <div class="card">
+    <div class="card-body">
+
+      <p class="mb-3">
+        Vas a registrar el <strong>check-out</strong> de la siguiente estadía:
+      </p>
+
+      <dl class="row mb-4">
+        <dt class="col-sm-3">Habitación</dt>
+        <dd class="col-sm-9">{{ estadia.habitacion }}</dd>
+
+        <dt class="col-sm-3">Reserva</dt>
+        <dd class="col-sm-9">{{ estadia.reserva.code }}</dd>
+
+        <dt class="col-sm-3">Huésped</dt>
+        <dd class="col-sm-9">{{ estadia.huesped_principal }}</dd>
+
+        <dt class="col-sm-3">Check-in</dt>
+        <dd class="col-sm-9">
+          {{ estadia.fecha_check_in_real|default:estadia.fecha_check_in_prevista }}
+        </dd>
+
+        <dt class="col-sm-3">Check-out previsto</dt>
+        <dd class="col-sm-9">{{ estadia.fecha_check_out_prevista }}</dd>
+      </dl>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'operaciones:panel_operaciones' %}"
+             class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-danger">
+            Confirmar check-out
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

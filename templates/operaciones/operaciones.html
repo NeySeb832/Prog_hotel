@@ -1,0 +1,99 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}Operaciones · Check-in / Check-out{% endblock %}
+{% block page_title %}Módulo de Operaciones{% endblock %}
+{% block page_subtitle %}Gestión de check-in / check-out y ocupación de habitaciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+
+  <!-- Reservas para hoy -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Reservas para hoy (pendientes de check-in)</h2>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Huésped</th>
+            <th>Habitación</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in reservas_para_hoy %}
+          <tr>
+            <td>{{ r.code }}</td>
+            <td>{{ r.guest_name|default:r.guest }}</td>
+            <td>{{ r.room }}</td>
+            <td>{{ r.check_in }}</td>
+            <td>{{ r.check_out }}</td>
+            <td class="text-end">
+              <a href="{% url 'operaciones:check_in' r.id %}"
+                 class="btn btn-success btn-sm">
+                Check-in
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-3">
+              No hay reservas para hoy.
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Habitaciones ocupadas (estadías en curso) -->
+  <div class="card">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Habitaciones ocupadas (estadías en curso)</h2>
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>Hab.</th>
+            <th>Reserva</th>
+            <th>Huésped</th>
+            <th>Check-in</th>
+            <th>Check-out previsto</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for e in estadias_en_curso %}
+          <tr>
+            <td>{{ e.habitacion }}</td>
+            <td>{{ e.reserva.code }}</td>
+            <td>{{ e.huesped_principal }}</td>
+            <td>{{ e.fecha_check_in_real|default:e.fecha_check_in_prevista }}</td>
+            <td>{{ e.fecha_check_out_prevista }}</td>
+            <td class="text-end">
+              <a href="{% url 'operaciones:check_out' e.id %}"
+                 class="btn btn-danger btn-sm">
+                Check-out
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center py-3">
+              No hay habitaciones ocupadas.
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

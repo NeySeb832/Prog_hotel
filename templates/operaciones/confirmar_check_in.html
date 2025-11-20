@@ -1,0 +1,51 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}Confirmar check-in{% endblock %}
+{% block page_title %}Confirmar check-in{% endblock %}
+{% block page_subtitle %}
+  Reserva {{ reserva.code }} · {{ reserva.room }} · {{ reserva.check_in }} — {{ reserva.check_out }}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-2">
+  <div class="card">
+    <div class="card-body">
+
+      <p class="mb-3">
+        Vas a registrar el <strong>check-in</strong> de la siguiente reserva:
+      </p>
+
+      <dl class="row mb-4">
+        <dt class="col-sm-3">Código de reserva</dt>
+        <dd class="col-sm-9">{{ reserva.code }}</dd>
+
+        <dt class="col-sm-3">Huésped</dt>
+        <dd class="col-sm-9">{{ reserva.guest_name|default:reserva.guest }}</dd>
+
+        <dt class="col-sm-3">Habitación</dt>
+        <dd class="col-sm-9">{{ reserva.room }}</dd>
+
+        <dt class="col-sm-3">Fecha de entrada</dt>
+        <dd class="col-sm-9">{{ reserva.check_in }}</dd>
+
+        <dt class="col-sm-3">Fecha de salida</dt>
+        <dd class="col-sm-9">{{ reserva.check_out }}</dd>
+      </dl>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'operaciones:panel_operaciones' %}"
+             class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-success">
+            Confirmar check-in
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

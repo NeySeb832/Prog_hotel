@@ -1,0 +1,115 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}
+  {% if modo == "crear" %}
+    Nuevo cliente · HotelManager
+  {% else %}
+    Editar cliente · HotelManager
+  {% endif %}
+{% endblock %}
+
+{% block page_title %}
+  {% if modo == "crear" %}Nuevo cliente{% else %}Editar cliente{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+  {% if modo == "crear" %}
+    Crea un nuevo cliente registrado para asociar reservas.
+  {% else %}
+    Modifica los datos básicos del cliente. La contraseña no se puede cambiar desde este módulo.
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        {% if error %}
+          <div class="alert alert-danger small">
+            {{ error }}
+          </div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nombre de usuario</label>
+            <input type="text"
+                   name="username"
+                   class="form-control"
+                   required
+                   value="{% if modo == 'editar' %}{{ cliente.username }}{% else %}{{ form_data.username|default_if_none:'' }}{% endif %}">
+          </div>
+
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label">Nombre</label>
+              <input type="text"
+                     name="first_name"
+                     class="form-control"
+                     value="{% if modo == 'editar' %}{{ cliente.first_name }}{% else %}{{ form_data.first_name|default_if_none:'' }}{% endif %}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellidos</label>
+              <input type="text"
+                     name="last_name"
+                     class="form-control"
+                     value="{% if modo == 'editar' %}{{ cliente.last_name }}{% else %}{{ form_data.last_name|default_if_none:'' }}{% endif %}">
+            </div>
+          </div>
+
+          <div class="mt-3 mb-3">
+            <label class="form-label">Email</label>
+            <input type="email"
+                   name="email"
+                   class="form-control"
+                   value="{% if modo == 'editar' %}{{ cliente.email }}{% else %}{{ form_data.email|default_if_none:'' }}{% endif %}">
+          </div>
+
+          {# Campo de contraseña SOLO al crear #}
+          {% if modo == "crear" %}
+            <div class="mb-3">
+              <label class="form-label">
+                Contraseña inicial
+                <span class="text-muted small">
+                  (el cliente podrá cambiarla luego)
+                </span>
+              </label>
+              <input type="password"
+                     name="password"
+                     class="form-control">
+            </div>
+          {% endif %}
+
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input"
+                   type="checkbox"
+                   role="switch"
+                   id="switchActivo"
+                   name="is_active"
+                   {% if modo == "crear" %}
+                     {% if form_data.is_active|default_if_none:True %}checked{% endif %}
+                   {% else %}
+                     {% if cliente.is_active %}checked{% endif %}
+                   {% endif %}>
+            <label class="form-check-label" for="switchActivo">
+              Cliente activo
+            </label>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-dark">
+              {% if modo == "crear" %}Crear cliente{% else %}Guardar cambios{% endif %}
+            </button>
+            <a href="{% if modo == 'editar' %}{% url 'clientes:detalle' cliente.pk %}{% else %}{% url 'clientes:lista' %}{% endif %}"
+               class="btn btn-light">
+              Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

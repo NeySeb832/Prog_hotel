@@ -1,0 +1,359 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Dashboard · HotelManager{% endblock %}
+
+{% block extra_head %}
+  <style>
+    :root{
+      --line:#e5e7eb;
+      --radius:14px;
+      --muted:#6b7280;
+    }
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+      padding:18px;
+      height:100%;
+    }
+    .kpi h6{
+      color:var(--muted);
+      font-size:.8rem;
+      margin:0 0 .35rem;
+      display:flex;
+      align-items:center;
+      gap:.5rem;
+    }
+    .kpi .value{
+      font-weight:800;
+      font-size:1.3rem;
+    }
+    .kpi .hint{
+      color:var(--muted);
+      font-size:.75rem;
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+    }
+    .panel-head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+      font-weight:700;
+    }
+    .panel-body{
+      padding:14px 16px;
+    }
+
+    .chip{
+      display:inline-block;
+      padding:.2rem .5rem;
+      border-radius:999px;
+      font-size:.7rem;
+      font-weight:500;
+    }
+    .chip.dark{ background:#111827; color:#fff; }
+    .chip.gray{ background:#f3f4f6; color:#374151; }
+    .chip.green{ background:#ecfdf5; color:#065f46; }
+    .chip.yellow{ background:#fff7ed; color:#92400e; }
+    .chip.red{ background:#fef2f2; color:#991b1b; }
+    .chip.blue{ background:#eff6ff; color:#1e40af; }
+
+    .reserva-item{
+      display:flex;
+      justify-content:space-between;
+      padding:10px 0;
+      border-bottom:1px dashed #eceff4;
+      gap:8px;
+    }
+    .reserva-item:last-child{ border-bottom:0; }
+    .reserva-meta{ color:var(--muted); font-size:.8rem; }
+
+    .grid-rooms{
+      display:grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap:6px;
+    }
+    .room{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:4px 0;
+      text-align:center;
+      font-weight:600;
+      font-size:.8rem;
+      user-select:none;
+    }
+    .room.disp{
+      background:#ecfdf5;
+      color:#065f46;
+      border-color:#bbf7d0;
+    }
+    .room.ocup{
+      background:#eef2ff;
+      color:#1e3a8a;
+      border-color:#c7d2fe;
+    }
+    .room.maint{
+      background:#fff7ed;
+      color:#92400e;
+      border-color:#fed7aa;
+    }
+
+    .chart-compact{
+      position:relative;
+      height:90px;
+    }
+  </style>
+{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}
+  Resumen general del hotel ·
+  {{ today|date:"l" }}, {{ today|date:"d" }} de {{ today|date:"F" }} de {{ today|date:"Y" }}
+{% endblock %}
+
+{% block content %}
+
+  <!-- KPIs principales -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-lg-4">
+      <div class="kpi h-100">
+        <h6><i class="bi bi-building-check"></i> Ocupación</h6>
+        <div class="value">{{ ocupacion_pct }}%</div>
+        <div class="hint">
+          {{ ocupadas_hoy }} de {{ total_habitaciones }} habitaciones ocupadas
+          {% if reservadas_hoy %} · {{ reservadas_hoy }} reservadas{% endif %}
+        </div>
+        <div class="panel-body ps-0 pe-0 mt-2">
+          <div class="chart-compact">
+            <canvas id="chartOcupacion"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-4">
+      <div class="kpi h-100">
+        <h6><i class="bi bi-cash-coin"></i> Ingresos hoy</h6>
+        <div class="value">
+          ${{ ingresos_hoy|floatformat:0 }}
+        </div>
+        <div class="hint">
+          Ticket promedio:
+          ${{ tarifa_promedio|default:0|floatformat:0 }}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-4">
+      <div class="kpi h-100">
+        <h6><i class="bi bi-person-check"></i> Check-ins hoy</h6>
+        <div class="value">{{ checkins_hoy }}</div>
+        <div class="hint">
+          Check-outs: {{ checkouts_hoy }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuevas reservas + alertas -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-xl-4">
+      <div class="kpi h-100">
+        <h6><i class="bi bi-calendar-plus"></i> Nuevas reservas</h6>
+        <div class="value">{{ nuevas_reservas_hoy }}</div>
+        <div class="hint">Hoy</div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-8">
+      <div class="panel h-100">
+        <div class="panel-head">
+          <i class="bi bi-bell"></i> Alertas importantes
+        </div>
+        <div class="panel-body">
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+            <div>
+              Pagos pendientes
+              <span class="text-muted">
+                · {{ pagos_pendientes_count }} reserva{{ pagos_pendientes_count|pluralize }} sin pago registrado
+              </span>
+            </div>
+            {% if pagos_pendientes_count %}
+              <span class="chip yellow">Urgente</span>
+            {% else %}
+              <span class="chip green">Al día</span>
+            {% endif %}
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+            <div>
+              Habitaciones fuera de servicio
+              <span class="text-muted">
+                ·
+                {% if hab_fuera_count %}
+                  {{ hab_fuera_count }} habitación{{ hab_fuera_count|pluralize }}
+                  {% if hab_fuera_example %}(ej: {{ hab_fuera_example }}){% endif %}
+                {% else %}
+                  ninguna habitación en mantenimiento
+                {% endif %}
+              </span>
+            </div>
+            <span class="chip gray">Info</span>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between py-2">
+            <div>
+              Ocupación mañana
+              <span class="text-muted">
+                · {{ ocupacion_manana_pct }}% de ocupación prevista
+              </span>
+            </div>
+            <span class="chip green">
+              {% if ocupacion_manana_pct >= 90 %}
+                Muy alta
+              {% elif ocupacion_manana_pct >= 70 %}
+                Alta
+              {% else %}
+                Normal
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reservas recientes + estado de habitaciones -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-xl-6">
+      <div class="panel h-100">
+        <div class="panel-head">
+          <i class="bi bi-clock-history"></i> Reservas recientes
+        </div>
+        <div class="panel-body">
+          {% for r in reservas_recientes %}
+            <div class="reserva-item">
+              <div>
+                <div class="fw-semibold">
+                  {{ r.guest_name|default:"Sin nombre" }}
+                </div>
+                <div class="reserva-meta">
+                  {{ r.code|default:"SIN-COD" }} ·
+                  Hab. {{ r.room.codigo }} ·
+                  {{ r.check_in|date:"Y-m-d" }}
+                </div>
+              </div>
+              <span class="chip
+                {% if r.status == 'CONFIRMED' %} dark
+                {% elif r.status == 'PENDING' %} blue
+                {% elif r.status == 'CHECKED_IN' %} gray
+                {% elif r.status == 'CHECKED_OUT' %} green
+                {% elif r.status == 'CANCELLED' %} red
+                {% endif %}
+              ">
+                {{ r.get_status_display }}
+              </span>
+            </div>
+          {% empty %}
+            <div class="text-muted small">
+              No hay reservas recientes.
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+      <div class="panel h-100">
+        <div class="panel-head">
+          <i class="bi bi-buildings"></i> Estado de habitaciones
+        </div>
+        <div class="panel-body">
+          <div class="grid-rooms mb-3">
+            {% for h in rooms_grid %}
+              <div class="room
+                {% if h.estado == 'OCUPADA' %}ocup
+                {% elif h.estado == 'RESERVADA' %}ocup
+                {% elif h.estado == 'MANTENIMIENTO' or h.estado == 'BLOQUEADA' %}maint
+                {% else %}disp
+                {% endif %}
+              ">
+                {{ h.codigo }}
+              </div>
+            {% empty %}
+              <div class="text-muted small">
+                No hay habitaciones registradas.
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex align-items-center gap-3 small">
+            <div class="d-flex align-items-center gap-2">
+              <span class="room disp" style="width:20px;height:20px;padding:0;"></span> Disponible
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="room ocup" style="width:20px;height:20px;padding:0;"></span> Ocupada / reservada
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="room maint" style="width:20px;height:20px;padding:0;"></span> Fuera de servicio
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script>
+    (function() {
+      const labels = {{ ocupacion_labels|safe }};
+      const dataValues = {{ ocupacion_values|safe }};
+
+      const ctx = document.getElementById('chartOcupacion');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              data: dataValues,
+              borderWidth: 2,
+              borderColor: '#111827',
+              pointRadius: 0,
+              fill: true,
+              backgroundColor: 'rgba(17, 24, 39, .08)',
+              tension: .35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                min: 0,
+                max: 100,
+                ticks: { stepSize: 20 },
+                grid: { color: '#eef2f7' }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+    })();
+  </script>
+{% endblock %}
