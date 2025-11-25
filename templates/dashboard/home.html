@@ -1,22 +1,29 @@
 <!doctype html>
 <html lang="es">
+{% load static %}
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hotel Elegance — Inicio</title>
+  <title>{{ config_general.hotel_nombre|default:"Hotel Elegance" }} — Inicio</title>
 
-  <!-- Bootstrap 5 + Icons (CDN) -->
+  <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     :root{
-      --radius: 16px;
-      --brand-dark:#000;
-      --brand-on-dark:#fff;
+      --radius:16px;
+      --border:#e5e7eb;
+      --muted:#6b7280;
+      --soft:#f9fafb;
     }
 
-    /* Navbar interactiva */
+    body{
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+    }
+
     .navbar-brand i{ margin-right:.5rem; }
     .navbar .nav-link{
       border-radius:999px;
@@ -25,78 +32,223 @@
       transition:background-color .15s ease, color .15s ease;
     }
     .navbar .nav-link:hover,
-    .navbar .nav-link:focus{
-      background-color:var(--brand-dark);
-      color:var(--brand-on-dark) !important;
-      text-decoration:none;
-      outline:none;
-    }
-    .navbar .nav-link.active,
-    .navbar .nav-link[aria-current="page"]{
-      background-color:var(--brand-dark);
-      color:var(--brand-on-dark) !important;
+    .navbar .nav-link.active{
+      background-color:#111827;
+      color:#fff !important;
     }
 
-    /* Hero */
-    .hero-wrap{
-      position: relative;
-      border-radius: var(--radius);
-      overflow: hidden;
-      min-height: 360px;
-    }
-    .hero-img{
-      position: absolute; inset: 0;
-      background: url("https://images.unsplash.com/photo-1501117716987-c8e2a3a67f94?q=80&w=1600&auto=format&fit=crop") center/cover no-repeat;
-      filter: brightness(.85);
-    }
-    .hero-overlay{
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.35));
+    /* HERO */
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      background:#020617;
+      color:#f9fafb;
+      min-height:260px;
+      display:flex;
+      align-items:stretch;
     }
     .hero-content{
-      position: relative; z-index: 2; color: #fff;
-      text-align: center; padding: 80px 24px;
+      position:relative;
+      z-index:2;
+      padding:1.8rem 1.8rem;
     }
-    .hero-content .btn{
-      border-radius: 12px;
-      padding: .6rem 1.1rem;
+    .hero-title{
+      font-size:1.9rem;
+      font-weight:700;
+      letter-spacing:-.04em;
+      margin-bottom:.4rem;
+    }
+    .hero-text{
+      font-size:.95rem;
+      color:#e5e7eb;
+      max-width:430px;
+    }
+    .hero-badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.4rem;
+      margin-bottom:.8rem;
+      margin-top:.4rem;
+    }
+    .hero-badge{
+      border-radius:999px;
+      background:rgba(15,23,42,.65);
+      border:1px solid rgba(148,163,184,.4);
+      padding:.15rem .6rem;
+      font-size:.72rem;
+      display:inline-flex;
+      align-items:center;
+      gap:.25rem;
+    }
+    .hero-link{
+      font-size:.85rem;
+      color:#e5e7eb;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+    }
+    .hero-link i{ font-size:.9rem; }
+
+    .hero-side{
+      position:relative;
+      flex:1;
+      min-height:230px;
+      overflow:hidden;
+    }
+    .hero-img{
+      position:absolute;
+      inset:0;
+      background:url("https://images.pexels.com/photos/271639/pexels-photo-271639.jpeg?cs=srgb&dl=pexels-pixabay-271639.jpg&fm=jpg")
+                 center/cover no-repeat;
+      filter:brightness(.75);
+      transform:scale(1.02);
+    }
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top,rgba(15,23,42,.2),transparent 55%);
     }
 
-    /* Cards de servicios */
-    .service-card{
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,.08);
-      transition: .2s ease;
-      height: 100%;
+    /* SECCIONES */
+    .section{
+      margin-top:2rem;
     }
-    .service-card:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(0,0,0,.06);
+    .section-title{
+      font-size:1.1rem;
+      font-weight:600;
+      margin-bottom:.1rem;
     }
-    .service-icon{
-      width: 44px; height: 44px;
-      display: grid; place-items: center;
-      border-radius: 50%;
-      background: #f4f6f9;
-      margin: 0 auto 10px auto;
-      font-size: 20px; color: #232a36;
+    .section-subtitle{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-bottom:0;
     }
 
-    /* Testimonios */
-    .testimonial{
-      border-radius: var(--radius);
-      border: 1px solid rgba(0,0,0,.08);
+    .soft-card{
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:#fff;
+      padding:1.05rem 1.15rem;
+      height:100%;
+    }
+    .soft-card p{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-bottom:.4rem;
+    }
+
+    /* Habitaciones destacadas */
+    .room-card{
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:#fff;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      transition:box-shadow .15s ease, transform .15s ease;
+    }
+    .room-card:hover{
+      box-shadow:0 10px 25px rgba(15,23,42,.08);
+      transform:translateY(-2px);
+    }
+    .room-img{
+      position:relative;
+      padding-top:58%;
+      overflow:hidden;
+    }
+    .room-img img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform .5s ease;
+    }
+    .room-card:hover .room-img img{
+      transform:scale(1.04);
+    }
+    .room-body{
+      padding:.9rem 1rem 1.1rem;
+      font-size:.85rem;
+    }
+    .room-title{
+      font-size:.95rem;
+      font-weight:600;
+    }
+    .badge-soft{
+      background:var(--soft);
+      border-radius:999px;
+      padding:.15rem .55rem;
+      font-size:.7rem;
+    }
+    .room-meta{
+      font-size:.8rem;
+      color:var(--muted);
+    }
+    .room-price{
+      font-weight:700;
+      font-size:.9rem;
+    }
+
+    /* Banda de confianza */
+    .trust-band{
+      border-radius:var(--radius);
+      background:#020617;
+      color:#e5e7eb;
+      padding:1rem 1.4rem;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:.7rem;
+    }
+    .trust-band h3{
+      font-size:.95rem;
+      font-weight:600;
+      margin:0;
+    }
+    .trust-pill{
+      font-size:.75rem;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.5);
+      padding:.15rem .65rem;
+      display:inline-flex;
+      align-items:center;
+      gap:.3rem;
     }
 
     /* Footer */
-    footer{
-      background: #f3f4f6;
-      border-top: 1px solid rgba(0,0,0,.06);
+    .footer{
+      margin-top:2rem;
+      padding:1.8rem 0 1.4rem;
+      border-top:1px solid #e5e7eb;
+      background:#fff;
+    }
+    .small-muted{
+      font-size:.8rem;
+      color:var(--muted);
     }
     .footer-bottom{
-      border-top: 1px solid rgba(0,0,0,.08);
-      color:#8a93a1;
-      font-size:.9rem;
+      border-top:1px solid #e5e7eb;
+      margin-top:1rem;
+      padding-top:.6rem;
+      font-size:.76rem;
+      color:var(--muted);
+    }
+
+    @media (max-width: 991.98px){
+      .hero{
+        flex-direction:column;
+      }
+      .hero-content{
+        padding:1.4rem 1.4rem .9rem;
+      }
+      .hero-side{
+        min-height:200px;
+      }
     }
   </style>
 </head>
@@ -106,7 +258,7 @@
   <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
       <a class="navbar-brand fw-semibold" href="/">
-        <i class="bi bi-building"></i> Hotel Elegance
+        <i class="bi bi-building"></i> {{ config_general.hotel_nombre|default:"Hotel Elegance" }}
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
@@ -115,173 +267,279 @@
 
       <div id="mainNav" class="collapse navbar-collapse">
         <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link active" href="/" data-route="inicio" aria-current="page">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="/nuestras_habitaciones/" data-route="habitaciones">Habitaciones</a></li>
-          <li class="nav-item"><a class="nav-link" href="/nuestros_servicios/" data-route="servicios">Servicios</a></li>
-          <li class="nav-item"><a class="nav-link" href="/sobre_nosotros/" data-route="nosotros">Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contacto/" data-route="contacto">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/" aria-current="page">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestras_habitaciones/">Habitaciones</a></li>
+          <li class="nav-item"><a class="nav-link" href="/nuestros_servicios/">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="/sobre_nosotros/">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contacto/">Contacto</a></li>
         </ul>
-        <a class="btn btn-dark btn-sm rounded-3" href="/login/"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión</a>
+        <a class="btn btn-dark btn-sm rounded-3" href="/login/">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+        </a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section class="container my-4">
-    <div class="hero-wrap">
-      <div class="hero-img"></div>
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <p class="text-uppercase small mb-2">Bienvenido a Hotel Elegance</p>
-        <h1 class="display-6 fw-semibold mb-2">Lujo y confort en el corazón de la ciudad</h1>
-        <a href="/reservar/" class="btn btn-light text-dark fw-semibold">
-          <i class="bi bi-calendar2-check me-2"></i>Hacer Reservación
+  <!-- CONTENIDO -->
+  <main class="container pb-4">
+
+    <!-- HERO PRINCIPAL -->
+    <section class="mt-3">
+      <div class="hero">
+        <div class="hero-content">
+          <div class="hero-badges">
+            <span class="hero-badge">
+              <i class="bi bi-star-fill text-warning"></i>
+              Estancias pensadas para descansar
+            </span>
+            <span class="hero-badge">
+              <i class="bi bi-wifi"></i>
+              Wifi de alta velocidad incluido
+            </span>
+          </div>
+          <h1 class="hero-title">
+            La estadía que tu viaje merece.
+          </h1>
+          <p class="hero-text mb-3">
+            {{ config_general.hotel_nombre|default:"Hotel Elegance" }} combina habitaciones modernas,
+            servicio cercano y una ubicación ideal para explorar la ciudad o trabajar con tranquilidad.
+          </p>
+
+          <!-- IMPORTANTE: sin botón "Reservar ahora" -->
+          <a href="/nuestras_habitaciones/" class="hero-link">
+            Ver habitaciones disponibles
+            <i class="bi bi-arrow-right-short"></i>
+          </a>
+        </div>
+
+        <div class="hero-side d-none d-md-block">
+          <div class="hero-img"></div>
+          <div class="hero-overlay"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUMEN RÁPIDO -->
+    <section class="section">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="soft-card">
+            <h2 class="section-title mb-1">Ubicación estratégica</h2>
+            <p class="mb-2">
+              Estamos en {{ config_general.hotel_direccion|default:"una de las zonas más céntricas de la ciudad" }},
+              cerca de centros empresariales, restaurantes y principales vías de acceso.
+            </p>
+            <p class="small-muted mb-0">
+              Ideal para viajeros de negocios y turismo urbano.
+            </p>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="soft-card">
+            <h2 class="section-title mb-1">Confort en cada detalle</h2>
+            <p class="mb-2">
+              Habitaciones equipadas con camas confortables, espacios de trabajo, climatización y
+              amenidades pensadas para tu descanso.
+            </p>
+            <p class="small-muted mb-0">
+              Desde estancias cortas hasta visitas prolongadas.
+            </p>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="soft-card">
+            <h2 class="section-title mb-1">Atención cercana</h2>
+            <p class="mb-2">
+              Nuestro equipo está disponible para ayudarte con recomendaciones, traslados, eventos y
+              cualquier necesidad durante tu estadía.
+            </p>
+            <p class="small-muted mb-0">
+              Queremos que te sientas como en casa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HABITACIONES DESTACADAS -->
+    <section class="section">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <h2 class="section-title mb-0">Habitaciones destacadas</h2>
+          <p class="section-subtitle">
+            Algunas de las opciones más elegidas por nuestros huéspedes.
+          </p>
+        </div>
+        <a href="/nuestras_habitaciones/" class="btn btn-outline-dark btn-sm rounded-pill d-none d-md-inline-flex">
+          Ver todas las habitaciones
         </a>
       </div>
-    </div>
-  </section>
 
-  <!-- Servicios Destacados -->
-  <section class="container my-5">
-    <h2 class="h6 text-center text-muted mb-3">Servicios Destacados</h2>
+      <div class="row g-3 g-md-4">
+        <!-- Estándar -->
+        <div class="col-12 col-md-4">
+          <article class="room-card">
+            <div class="room-img">
+              <img src="https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?cs=srgb&dl=pexels-pixabay-164595.jpg&fm=jpg"
+                   alt="Habitación estándar de hotel">
+            </div>
+            <div class="room-body">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <h3 class="room-title mb-0">Habitación Estándar</h3>
+                <span class="badge-soft">Viajes cortos</span>
+              </div>
+              <p class="room-meta mb-2">
+                Cama doble, escritorio compacto y wifi de alta velocidad para descansar después de un día de trabajo o turismo.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="room-price">$180.000 / noche</span>
+                <span class="room-meta"><i class="bi bi-person"></i> 1–2 huéspedes</span>
+              </div>
+            </div>
+          </article>
+        </div>
 
-    <div class="row g-3">
-      <div class="col-12 col-md-3">
-        <div class="card service-card p-3">
-          <div class="service-icon"><i class="bi bi-wifi"></i></div>
-          <h3 class="h6 text-center mb-1">WiFi Gratis</h3>
-          <p class="text-muted small text-center mb-0">Internet de alta velocidad en todas las áreas</p>
+        <!-- Superior -->
+        <div class="col-12 col-md-4">
+          <article class="room-card">
+            <div class="room-img">
+              <img src="https://images.pexels.com/photos/237371/pexels-photo-237371.jpeg?cs=srgb&dl=pexels-pixabay-237371.jpg&fm=jpg"
+                   alt="Habitación superior de hotel">
+            </div>
+            <div class="room-body">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <h3 class="room-title mb-0">Habitación Superior</h3>
+                <span class="badge-soft">Vista a la ciudad</span>
+              </div>
+              <p class="room-meta mb-2">
+                Más espacio, cama queen y un gran ventanal para disfrutar la ciudad con toda comodidad.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="room-price">$250.000 / noche</span>
+                <span class="room-meta"><i class="bi bi-person"></i> 1–3 huéspedes</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Suite -->
+        <div class="col-12 col-md-4">
+          <article class="room-card">
+            <div class="room-img">
+              <img src="https://images.pexels.com/photos/1838554/pexels-photo-1838554.jpeg?cs=srgb&dl=pexels-elina-sazonova-1838554.jpg&fm=jpg"
+                   alt="Suite de hotel">
+            </div>
+            <div class="room-body">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <h3 class="room-title mb-0">Suite Junior</h3>
+                <span class="badge-soft">Para ocasiones especiales</span>
+              </div>
+              <p class="room-meta mb-2">
+                Zona de sala, cama king y baño amplio con amenidades premium para una estadía inolvidable.
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="room-price">$420.000 / noche</span>
+                <span class="room-meta"><i class="bi bi-person"></i> 2–3 huéspedes</span>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
-      <div class="col-12 col-md-3">
-        <div class="card service-card p-3">
-          <div class="service-icon"><i class="bi bi-car-front"></i></div>
-          <h3 class="h6 text-center mb-1">Estacionamiento</h3>
-          <p class="text-muted small text-center mb-0">Estacionamiento privado gratuito</p>
-        </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <div class="card service-card p-3">
-          <div class="service-icon"><i class="bi bi-egg-fried"></i></div>
-          <h3 class="h6 text-center mb-1">Restaurante</h3>
-          <p class="text-muted small text-center mb-0">Cocina gourmet las 24 horas</p>
-        </div>
-      </div>
-      <div class="col-12 col-md-3">
-        <div class="card service-card p-3">
-          <div class="service-icon"><i class="bi bi-water"></i></div>
-          <h3 class="h6 text-center mb-1">Piscina</h3>
-          <p class="text-muted small text-center mb-0">Piscina climatizada y jacuzzi</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Testimonios -->
-  <section class="container my-5">
-    <h2 class="h6 text-center text-muted mb-3">Lo que dicen nuestros huéspedes</h2>
+      <div class="mt-3 d-md-none">
+        <a href="/nuestras_habitaciones/" class="btn btn-outline-dark btn-sm rounded-pill w-100">
+          Ver todas las habitaciones
+        </a>
+      </div>
+    </section>
 
-    <div class="row g-3">
-      <div class="col-12 col-md-4">
-        <div class="card testimonial p-3">
-          <div class="mb-1 text-warning">
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
+    <!-- SERVICIOS / EXPERIENCIA -->
+    <section class="section">
+      <div class="row g-3 g-md-4">
+        <div class="col-12 col-lg-6">
+          <div class="soft-card h-100">
+            <h2 class="section-title mb-1">Gastronomía y espacios comunes</h2>
+            <p>
+              Disfruta de nuestro restaurante, desayuno tipo buffet y una carta balanceada entre sabores locales
+              e internacionales.
+            </p>
+            <p class="mb-0">
+              Además, contamos con lobby cómodo, zonas de coworking y salas para reuniones pequeñas.
+            </p>
           </div>
-          <div class="fw-semibold small">María González</div>
-          <p class="text-muted small mb-0">“Una experiencia increíble. El servicio fue excepcional y las instalaciones de primera clase.”</p>
         </div>
-      </div>
-      <div class="col-12 col-md-4">
-        <div class="card testimonial p-3">
-          <div class="mb-1 text-warning">
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
+        <div class="col-12 col-lg-6">
+          <div class="soft-card h-100">
+            <h2 class="section-title mb-1">Servicios para tu día a día</h2>
+            <ul class="small-muted mb-0 ps-3">
+              <li>Recepción 24/7 y asistencia en traslados.</li>
+              <li>Wifi de alta velocidad en todo el hotel.</li>
+              <li>Lavandería bajo demanda.</li>
+              <li>Aliados para tours y experiencias en la ciudad.</li>
+            </ul>
           </div>
-          <div class="fw-semibold small">Carlos Rodríguez</div>
-          <p class="text-muted small mb-0">“Perfecto para una escapada romántica. La suite tenía vistas espectaculares.”</p>
         </div>
       </div>
-      <div class="col-12 col-md-4">
-        <div class="card testimonial p-3">
-          <div class="mb-1 text-warning">
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-            <i class="bi bi-star-fill"></i>
-          </div>
-          <div class="fw-semibold small">Ana Martínez</div>
-          <p class="text-muted small mb-0">“Ideal para viajes de negocios. Excelente ubicación y servicios de conferencias.”</p>
+    </section>
+
+    <!-- BANDA DE CONFIANZA -->
+    <section class="section">
+      <div class="trust-band">
+        <div>
+          <h3>Más que un lugar donde dormir.</h3>
+          <p class="small-muted mb-0">
+            En {{ config_general.hotel_nombre|default:"Hotel Elegance" }} queremos que cada estadía sea simple,
+            cómoda y sin sorpresas.
+          </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="trust-pill">
+            <i class="bi bi-shield-check"></i> Reservas seguras
+          </span>
+          <span class="trust-pill">
+            <i class="bi bi-clock-history"></i> Check-in ágil
+          </span>
+          <span class="trust-pill">
+            <i class="bi bi-emoji-smile"></i> Equipo dispuesto a ayudarte
+          </span>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <footer class="mt-5">
-    <div class="container py-5">
-      <div class="row g-4">
-        <div class="col-12 col-md-3">
-          <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-building me-2"></i>
-            <strong>Hotel Elegance</strong>
-          </div>
-          <p class="text-muted small mb-0">Lujo y confort excepcional en el corazón de la ciudad.</p>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="fw-semibold mb-1">{{ config_general.hotel_nombre|default:"Hotel Elegance" }}</div>
+          <p class="small-muted mb-0">
+            Habitaciones modernas, servicio cercano y una ubicación ideal para tu próximo viaje.
+          </p>
         </div>
-
-        <div class="col-6 col-md-3">
-          <h6 class="fw-semibold mb-3">Enlaces Rápidos</h6>
-          <ul class="list-unstyled small text-muted">
-            <li><a class="link-secondary text-decoration-none" href="/">Inicio</a></li>
-            <li><a class="link-secondary text-decoration-none" href="/nuestras_habitaciones/">Habitaciones</a></li>
-            <li><a class="link-secondary text-decoration-none" href="/nuestros_servicios/">Servicios</a></li>
-          </ul>
+        <div class="col-12 col-md-4">
+          <h6 class="fw-semibold mb-2">Ubicación</h6>
+          <p class="small mb-0">
+            <i class="bi bi-geo-alt me-2"></i>{{ config_general.hotel_direccion|default:"Av. Principal 123" }}
+          </p>
         </div>
-
-        <div class="col-6 col-md-3">
-          <h6 class="fw-semibold mb-3">Servicios</h6>
-          <ul class="list-unstyled small text-muted">
-            <li>Restaurante</li>
-            <li>Spa & Wellness</li>
-            <li>Centro de Negocios</li>
-            <li>Eventos</li>
-          </ul>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <h6 class="fw-semibold mb-3">Contacto</h6>
-          <ul class="list-unstyled small text-muted">
-            <li><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</li>
-            <li><i class="bi bi-envelope me-2"></i>info@hotelelegance.com</li>
-            <li><i class="bi bi-geo-alt me-2"></i>Av. Principal 123</li>
-          </ul>
+        <div class="col-12 col-md-4">
+          <h6 class="fw-semibold mb-2">Contacto</h6>
+          <p class="small mb-1">
+            <i class="bi bi-telephone me-2"></i>{{ config_general.hotel_telefono|default:"+57 601 000 0000" }}
+          </p>
+          <p class="small mb-0">
+            <i class="bi bi-envelope me-2"></i>{{ config_general.hotel_email|default:"info@hotelelegance.com" }}
+          </p>
         </div>
       </div>
-      <div class="footer-bottom text-center pt-3 mt-4">
-        <p class="small mb-0">© 2024 Hotel Elegance. Todos los derechos reservados.</p>
+      <div class="footer-bottom text-center mt-2">
+        &copy; {{ config_general.hotel_nombre|default:"Hotel Elegance" }} · {% now "Y" %}
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Marca activo según URL cuando navegas con archivos planos -->
-  <script>
-    (function() {
-      const current = (window.location.pathname.replace(/\/+$/,'').split('/').filter(Boolean)[0] || 'inicio').toLowerCase();
-      document.querySelectorAll('.navbar .nav-link').forEach(a=>{
-        const r = (a.dataset.route || '').toLowerCase();
-        if (r && r === current) {
-          a.classList.add('active');
-          a.setAttribute('aria-current','page');
-        } else if (!r && current === 'inicio' && a.getAttribute('href') === '/') {
-          a.classList.add('active');
-          a.setAttribute('aria-current','page');
-        }
-      });
-    })();
-  </script>
 </body>
 </html>

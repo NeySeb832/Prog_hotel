@@ -1,0 +1,411 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Reportes · HotelManager{% endblock %}
+
+{% block extra_head %}
+  <style>
+    :root{
+      --line:#e5e7eb;
+      --radius:14px;
+      --muted:#6b7280;
+    }
+    .panel{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+    }
+    .panel-head{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      gap:.55rem;
+      font-weight:700;
+    }
+    .panel-body{
+      padding:14px 16px;
+    }
+
+    .kpi{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:#fff;
+      padding:16px;
+      height:100%;
+    }
+    .kpi h6{
+      font-size:.8rem;
+      color:var(--muted);
+      margin:0 0 .35rem;
+    }
+    .kpi .value{
+      font-size:1.2rem;
+      font-weight:800;
+    }
+    .kpi .hint{
+      font-size:.75rem;
+      color:var(--muted);
+    }
+
+    .chip{
+      display:inline-block;
+      padding:.15rem .55rem;
+      border-radius:999px;
+      font-size:.7rem;
+      font-weight:500;
+    }
+    .chip.gray{ background:#f3f4f6; color:#374151; }
+    .chip.blue{ background:#eff6ff; color:#1d4ed8; }
+    .chip.green{ background:#ecfdf5; color:#16a34a; }
+    .chip.yellow{ background:#fef9c3; color:#854d0e; }
+    .chip.red{ background:#fee2e2; color:#b91c1c; }
+
+    .table-sm td, .table-sm th{
+      padding-top:.35rem;
+      padding-bottom:.35rem;
+    }
+
+    .chart-box{
+      position:relative;
+      height:220px;
+    }
+  </style>
+{% endblock %}
+
+{% block page_title %}Reportes{% endblock %}
+{% block page_subtitle %}
+  Resumen de reservas, ocupación e ingresos por rango de fechas
+{% endblock %}
+
+{% block content %}
+
+  {# ------------------- FILTROS DE FECHA ------------------- #}
+  <form method="get" class="mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Fecha desde</label>
+        <input type="date"
+               name="start"
+               value="{{ start_date|date:'Y-m-d' }}"
+               class="form-control">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Fecha hasta</label>
+        <input type="date"
+               name="end"
+               value="{{ end_date|date:'Y-m-d' }}"
+               class="form-control">
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-dark w-100" type="submit">
+          <i class="bi bi-funnel"></i> Aplicar
+        </button>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'reportes:resumen' %}" class="btn btn-outline-secondary w-100">
+          Limpiar filtros
+        </a>
+      </div>
+    </div>
+  </form>
+
+  {# ------------------- BOTONES EXPORTAR PDF ------------------- #}
+  <div class="row g-2 mb-3">
+    <div class="col-md-8 d-flex flex-wrap gap-2">
+      {# PDF del rango actual (personalizado) #}
+      <form method="get" action="{% url 'reportes:exportar_pdf' %}">
+        <input type="hidden" name="modo" value="personalizado">
+        <input type="hidden" name="start" value="{{ start_date|date:'Y-m-d' }}">
+        <input type="hidden" name="end" value="{{ end_date|date:'Y-m-d' }}">
+        <button class="btn btn-outline-dark btn-sm" type="submit">
+          <i class="bi bi-file-earmark-pdf"></i> PDF del rango actual
+        </button>
+      </form>
+
+      {# Predefinidos: diario, semanal, mensual, anual #}
+      <form method="get" action="{% url 'reportes:exportar_pdf' %}">
+        <input type="hidden" name="modo" value="diario">
+        <button class="btn btn-outline-secondary btn-sm" type="submit">
+          Diario (hoy)
+        </button>
+      </form>
+
+      <form method="get" action="{% url 'reportes:exportar_pdf' %}">
+        <input type="hidden" name="modo" value="semanal">
+        <button class="btn btn-outline-secondary btn-sm" type="submit">
+          Semanal (últimos 7 días)
+        </button>
+      </form>
+
+      <form method="get" action="{% url 'reportes:exportar_pdf' %}">
+        <input type="hidden" name="modo" value="mensual">
+        <button class="btn btn-outline-secondary btn-sm" type="submit">
+          Mensual (últimos 30 días)
+        </button>
+      </form>
+
+      <form method="get" action="{% url 'reportes:exportar_pdf' %}">
+        <input type="hidden" name="modo" value="anual">
+        <button class="btn btn-outline-secondary btn-sm" type="submit">
+          Anual (últimos 12 meses)
+        </button>
+      </form>
+    </div>
+
+    <div class="col-md-4 text-md-end">
+      <a href="{% url 'reportes:historial' %}" class="btn btn-link btn-sm">
+        <i class="bi bi-clock-history"></i> Ver historial de reportes
+      </a>
+    </div>
+  </div>
+
+  {# ------------------- KPIs PRINCIPALES ------------------- #}
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="kpi">
+        <h6>Reservas en el periodo</h6>
+        <div class="value">{{ total_reservas }}</div>
+        <div class="hint">
+          Del {{ start_date|date:"d/m/Y" }} al {{ end_date|date:"d/m/Y" }}
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="kpi">
+        <h6>Ingresos totales</h6>
+        <div class="value">${{ ingresos_totales|floatformat:0 }}</div>
+        <div class="hint">
+          {{ total_pagos }} pago{{ total_pagos|pluralize }} registrados
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="kpi">
+        <h6>Ticket promedio</h6>
+        <div class="value">${{ ticket_promedio|floatformat:0 }}</div>
+        <div class="hint">
+          Promedio por pago en el rango
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ------------------- GRÁFICOS ------------------- #}
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-xl-6">
+      <div class="panel h-100">
+        <div class="panel-head">
+          <i class="bi bi-graph-up-arrow"></i> Ingresos por día
+        </div>
+        <div class="panel-body">
+          <div class="chart-box">
+            <canvas id="chartIngresos"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+      <div class="panel h-100">
+        <div class="panel-head">
+          <i class="bi bi-building-check"></i> Ocupación por día
+        </div>
+        <div class="panel-body">
+          <div class="chart-box">
+            <canvas id="chartOcupacionPeriodo"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ------------------- TABLAS DETALLE ------------------- #}
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="panel">
+        <div class="panel-head">
+          <i class="bi bi-journal-bookmark"></i> Reservas (máx. 50)
+        </div>
+        <div class="panel-body">
+          <div class="mb-2 small text-muted">
+            Desglose por estado:
+          </div>
+          <div class="mb-3 small d-flex flex-wrap gap-1">
+            <span class="chip blue">Pendiente: {{ reservas_por_estado.PENDING|default:0 }}</span>
+            <span class="chip green">Confirmada: {{ reservas_por_estado.CONFIRMED|default:0 }}</span>
+            <span class="chip gray">Check-in: {{ reservas_por_estado.CHECKED_IN|default:0 }}</span>
+            <span class="chip gray">Check-out: {{ reservas_por_estado.CHECKED_OUT|default:0 }}</span>
+            <span class="chip red">Cancelada: {{ reservas_por_estado.CANCELLED|default:0 }}</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Código</th>
+                  <th>Huésped</th>
+                  <th>Hab.</th>
+                  <th>Fechas</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for r in reservas_list %}
+                <tr>
+                  <td>{{ r.code|default:"—" }}</td>
+                  <td class="small">
+                    {{ r.guest_name|default:"Sin nombre" }}<br>
+                    <span class="text-muted">{{ r.guest_email }}</span>
+                  </td>
+                  <td>Hab. {{ r.room.codigo }}</td>
+                  <td class="small">
+                    {{ r.check_in|date:"d/m" }} → {{ r.check_out|date:"d/m" }}<br>
+                    <span class="text-muted">Creada: {{ r.created_at|date:"d/m/Y" }}</span>
+                  </td>
+                  <td class="small">
+                    <span class="chip gray">{{ r.get_status_display }}</span>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted small">
+                    No hay reservas en el rango seleccionado.
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div class="panel">
+        <div class="panel-head">
+          <i class="bi bi-receipt"></i> Pagos (máx. 50)
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Fecha</th>
+                  <th>Reserva</th>
+                  <th class="text-end">Monto</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for p in pagos_list %}
+                <tr>
+                  <td class="small">
+                    {{ p.created_at|date:"Y-m-d" }}<br>
+                    <span class="text-muted">{{ p.created_at|time:"H:i" }}</span>
+                  </td>
+                  <td class="small">
+                    {{ p.reservation.code|default:"SIN-COD" }}<br>
+                    <span class="text-muted">
+                      {{ p.reservation.guest_name|default:"Sin nombre" }}
+                    </span>
+                  </td>
+                  <td class="text-end fw-semibold">
+                    ${{ p.amount|floatformat:0 }}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center text-muted small">
+                    No hay pagos en el rango seleccionado.
+                  </td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script>
+    (function() {
+      const labels = {{ chart_labels|safe }};
+      const ingresos = {{ chart_ingresos|safe }};
+      const ocupacion = {{ chart_ocupacion|safe }};
+
+      const ctxIng = document.getElementById('chartIngresos');
+      if (ctxIng) {
+        new Chart(ctxIng, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Ingresos',
+              data: ingresos,
+              borderWidth: 1,
+              backgroundColor: 'rgba(17, 24, 39, 0.8)'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: '#eef2f7' }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+
+      const ctxOcc = document.getElementById('chartOcupacionPeriodo');
+      if (ctxOcc) {
+        new Chart(ctxOcc, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Ocupación %',
+              data: ocupacion,
+              borderWidth: 2,
+              pointRadius: 2,
+              fill: true,
+              backgroundColor: 'rgba(17, 24, 39, 0.1)',
+              borderColor: '#111827',
+              tension: .35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                min: 0,
+                max: 100,
+                ticks: { stepSize: 20 },
+                grid: { color: '#eef2f7' }
+              },
+              x: {
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      }
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}
+  {% if modo == "editar" and reserva %}
+    Editar reserva {{ reserva.code }} · Hotel Elegance
+  {% else %}
+    Nueva reserva · Hotel Elegance
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% url 'reservas:mis_reservas' as url_mis_reservas %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">
+      {% if modo == "editar" and reserva %}
+        Editar reserva {{ reserva.code }}
+      {% else %}
+        Nueva reserva
+      {% endif %}
+    </h1>
+    <p class="text-muted mb-0">
+      Selecciona la habitación, fechas y número de huéspedes para tu estadía.
+    </p>
+  </div>
+  <div>
+    <a href="{{ url_mis_reservas }}" class="btn btn-outline-secondary btn-sm">
+      Volver a mis reservas
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <!-- Habitación -->
+        <div class="col-md-6">
+          <label for="id_room" class="form-label fw-semibold">
+            Habitación
+          </label>
+          <select name="room_id" id="id_room" class="form-select" required>
+            <option value="">Selecciona una habitación…</option>
+            {% for h in habitaciones %}
+              <option value="{{ h.id }}"
+                {% if form_data.room_id|stringformat:"s" == h.id|stringformat:"s" %}
+                  selected
+                {% elif reserva and reserva.room_id == h.id %}
+                  selected
+                {% endif %}
+              >
+                {{ h.codigo }}
+                {% if h.tipo %}
+                  · {{ h.tipo.nombre }}
+                  {% if h.tipo.capacidad %}
+                    (hasta {{ h.tipo.capacidad }} personas)
+                  {% endif %}
+                {% endif %}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Puedes cambiar la habitación siempre que haya disponibilidad.
+          </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="col-md-3">
+          <label for="id_check_in" class="form-label fw-semibold">Check-in</label>
+          <input
+            type="date"
+            name="check_in"
+            id="id_check_in"
+            class="form-control"
+            required
+            {% if form_data.check_in %}
+              value="{{ form_data.check_in }}"
+            {% elif reserva %}
+              value="{{ reserva.check_in|date:'Y-m-d' }}"
+            {% endif %}
+          >
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_check_out" class="form-label fw-semibold">Check-out</label>
+          <input
+            type="date"
+            name="check_out"
+            id="id_check_out"
+            class="form-control"
+            required
+            {% if form_data.check_out %}
+              value="{{ form_data.check_out }}"
+            {% elif reserva %}
+              value="{{ reserva.check_out|date:'Y-m-d' }}"
+            {% endif %}
+          >
+        </div>
+
+        <!-- Huéspedes -->
+        <div class="col-md-3">
+          <label for="id_adults" class="form-label fw-semibold">Adultos</label>
+          <input
+            type="number"
+            name="adults"
+            id="id_adults"
+            class="form-control"
+            min="1"
+            required
+            value="{% if form_data.adults %}{{ form_data.adults }}{% elif reserva %}{{ reserva.adults }}{% else %}1{% endif %}"
+          >
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_children" class="form-label fw-semibold">Niños</label>
+          <input
+            type="number"
+            name="children"
+            id="id_children"
+            class="form-control"
+            min="0"
+            value="{% if form_data.children %}{{ form_data.children }}{% elif reserva %}{{ reserva.children }}{% else %}0{% endif %}"
+          >
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div class="text-muted small">
+          {% if modo == "editar" and reserva %}
+            Estás editando una reserva existente. Si cambias fechas o habitación,
+            el hotel deberá volver a confirmar la disponibilidad.
+          {% else %}
+            Tu reserva se registrará como <strong>Pendiente</strong> y el hotel
+            confirmará los detalles más adelante.
+          {% endif %}
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{{ url_mis_reservas }}" class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            {% if modo == "editar" and reserva %}
+              Guardar cambios
+            {% else %}
+              Registrar reserva
+            {% endif %}
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Servicios · HotelManager{% endblock %}
+
+{% block extra_head %}
+<style>
+  .svc-card {
+    border-radius: .75rem;
+    border: 1px solid rgba(0,0,0,.05);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+  }
+  .svc-kpi-label{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#6b7280;
+  }
+  .svc-kpi-value{
+    font-weight:600;
+    font-size:1.1rem;
+  }
+  .table-servicios th,
+  .table-servicios td{
+    vertical-align:middle;
+    font-size:.9rem;
+  }
+  .badge-categoria{
+    border-radius:999px;
+    padding:.15rem .55rem;
+    font-size:.7rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}Servicios{% endblock %}
+{% block page_subtitle %}Catálogo de servicios del hotel y resumen de consumos{% endblock %}
+
+{% block content %}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+  <form method="get" class="flex-grow-1">
+    <div class="row g-2">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="bi bi-search"></i>
+          </span>
+          <input type="text"
+                 class="form-control border-start-0"
+                 name="q"
+                 placeholder="Buscar por nombre de servicio..."
+                 value="{{ filtros.q }}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="categoria" class="form-select">
+          <option value="">Todas las categorías</option>
+          {% for value, label in categorias %}
+            <option value="{{ value }}" {% if filtros.categoria == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select name="activo" class="form-select">
+          <option value="">Activos e inactivos</option>
+          <option value="1" {% if filtros.activo == "1" %}selected{% endif %}>Solo activos</option>
+          <option value="0" {% if filtros.activo == "0" %}selected{% endif %}>Solo inactivos</option>
+        </select>
+      </div>
+      <div class="col-md-2 d-grid">
+        <button class="btn btn-outline-secondary" type="submit">
+          <i class="bi bi-filter me-1"></i> Filtrar
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <div class="d-flex gap-2">
+    <a href="{% url 'servicios:nuevo' %}" class="btn btn-dark">
+      <i class="bi bi-plus-lg me-1"></i> Nuevo servicio
+    </a>
+    <a href="{% url 'servicios:consumos' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-receipt-cutoff me-1"></i> Ver consumos
+    </a>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="svc-card p-3">
+      <div class="svc-kpi-label">Servicios registrados</div>
+      <div class="svc-kpi-value">{{ kpis.total }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="svc-card p-3">
+      <div class="svc-kpi-label">Servicios activos</div>
+      <div class="svc-kpi-value">{{ kpis.activos }}</div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="svc-card p-3">
+      <div class="svc-kpi-label">Servicios inactivos</div>
+      <div class="svc-kpi-value">{{ kpis.inactivos }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="svc-card p-3">
+  {% if servicios %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle table-servicios mb-0">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Categoría</th>
+            <th class="text-end">Precio base</th>
+            <th>Estado</th>
+            <th class="text-end"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in servicios %}
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ s.nombre }}</div>
+                {% if s.descripcion %}
+                  <div class="text-muted small">{{ s.descripcion|truncatechars:120 }}</div>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-light text-muted border badge-categoria">
+                  {{ s.get_categoria_display }}
+                </span>
+              </td>
+              <td class="text-end">
+                {{ s.precio_base }} <span class="text-muted small">COP</span>
+              </td>
+              <td>
+                {% if s.activo %}
+                  <span class="badge bg-success-subtle text-success border-0">Activo</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary border-0">Inactivo</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <a href="{% url 'servicios:editar' s.id %}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="mb-0 text-muted small">
+      No hay servicios registrados aún. Crea el primero usando el botón
+      <strong>“Nuevo servicio”</strong>.
+    </p>
+  {% endif %}
+</div>
+
+{% endblock %}

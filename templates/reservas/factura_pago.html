@@ -14,72 +14,77 @@
     }
     .header td {
       vertical-align: top;
+      font-size: 11px;
     }
     .title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: bold;
       text-transform: uppercase;
     }
     .muted {
       color: #6b7280;
     }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-    .table th, .table td {
-      border: 1px solid #e5e7eb;
-      padding: 6px 8px;
-    }
-    .table th {
-      background: #f3f4f6;
-      text-align: left;
-    }
-    .totales {
-      margin-top: 12px;
-      width: 40%;
-      float: right;
-      border-collapse: collapse;
-    }
-    .totales th, .totales td {
-      border: 1px solid #e5e7eb;
-      padding: 6px 8px;
-    }
-    .totales th {
-      background: #f3f4f6;
-      text-align: left;
-    }
-    .text-right {
-      text-align: right;
-    }
     .mt-1 { margin-top: 4px; }
     .mt-2 { margin-top: 8px; }
     .mt-3 { margin-top: 12px; }
+    .mb-1 { margin-bottom: 4px; }
+    .mb-2 { margin-bottom: 8px; }
+    .text-right {
+      text-align: right;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+    .table th, .table td {
+      border: 1px solid #e5e7eb;
+      padding: 4px 6px;
+    }
+    .table thead th {
+      background-color: #f3f4f6;
+      font-weight: bold;
+      font-size: 11px;
+    }
+    hr {
+      border: 0;
+      border-top: 1px solid #e5e7eb;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Encabezado -->
   <table class="header">
     <tr>
-      <td>
+      <td style="width: 60%;">
         <div class="title">{{ hotel_nombre }}</div>
-        <div class="muted">NIT: {{ hotel_nit }}</div>
-        <div class="muted">{{ hotel_direccion }}</div>
-        <div class="muted">Tel: {{ hotel_telefono }}</div>
-        <div class="muted">Email: {{ hotel_email }}</div>
+        <div class="mt-1">
+          <div>{{ hotel_direccion }}</div>
+          <div>NIT: {{ hotel_nit }}</div>
+          <div>Tel: {{ hotel_telefono }}</div>
+          <div>Email: {{ hotel_email }}</div>
+        </div>
       </td>
-      <td style="text-align: right;">
-        <div><strong>Factura:</strong> {{ payment.invoice_number }}</div>
-        <div><strong>Fecha de emisión:</strong> {{ payment.created_at|date:"Y-m-d H:i" }}</div>
-        <div><strong>Reserva:</strong> {{ reservation.code }}</div>
+      <td style="width: 40%; text-align: right;">
+        <div style="font-size: 16px; font-weight: bold;">FACTURA</div>
+        <div class="mt-1">
+          <div><strong>N°:</strong> {{ payment.invoice_number }}</div>
+          <div><strong>Fecha de emisión:</strong> {{ payment.created_at|date:"Y-m-d H:i" }}</div>
+          <div><strong>Reserva:</strong> {{ reservation.code }}</div>
+        </div>
       </td>
     </tr>
   </table>
 
   <hr class="mt-2"/>
 
-  <table style="width: 100%; margin-top: 8px;">
+  <!-- Datos huésped / reserva -->
+  <table style="width: 100%; margin-top: 4px;">
     <tr>
       <td style="width: 50%;">
         <strong>Datos del huésped</strong>
@@ -96,66 +101,156 @@
       <td style="width: 50%;">
         <strong>Datos de la reserva</strong>
         <div class="mt-1">
-          <div><strong>Habitación:</strong> {{ reservation.room.codigo }}{% if reservation.room.tipo %} · {{ reservation.room.tipo.nombre }}{% endif %}</div>
-          <div><strong>Estancia:</strong> {{ reservation.check_in }} → {{ reservation.check_out }} ({{ reservation.nights }} noche{% if reservation.nights != 1 %}s{% endif %})</div>
-          <div><strong>Huéspedes:</strong> {{ reservation.adults }} adultos{% if reservation.children %}, {{ reservation.children }} niños{% endif %}</div>
+          <div>
+            <strong>Habitación:</strong>
+            {{ reservation.room.codigo }}
+            {% if reservation.room.tipo %}
+              · {{ reservation.room.tipo.nombre }}
+            {% endif %}
+          </div>
+          <div>
+            <strong>Check-in:</strong> {{ reservation.check_in|date:"Y-m-d" }}
+          </div>
+          <div>
+            <strong>Check-out:</strong> {{ reservation.check_out|date:"Y-m-d" }}
+          </div>
+          <div>
+            <strong>Noches:</strong> {{ reservation.nights }}
+          </div>
+          <div>
+            <strong>Tarifa / noche:</strong> ${{ reservation.base_rate }}
+          </div>
         </div>
       </td>
     </tr>
   </table>
 
-  <h3 class="mt-3">Detalle del pago</h3>
-
+  <!-- Detalle alojamiento -->
+  <h4 class="mt-3 mb-1">Detalle de alojamiento</h4>
   <table class="table">
     <thead>
       <tr>
         <th>Descripción</th>
-        <th class="text-right">Valor</th>
+        <th class="text-center">Noches</th>
+        <th class="text-right">Tarifa / noche</th>
+        <th class="text-right">Subtotal</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>
-          Pago asociado a reserva {{ reservation.code }}<br>
-          <span class="muted">
-            Método: {{ payment.get_method_display }}{% if payment.reference %} · Ref: {{ payment.reference }}{% endif %}
-          </span>
+          Alojamiento habitación {{ reservation.room.codigo }}
+          {% if reservation.room.tipo %}
+            · {{ reservation.room.tipo.nombre }}
+          {% endif %}
+        </td>
+        <td class="text-center">
+          {{ reservation.nights }}
         </td>
         <td class="text-right">
-          ${{ payment.amount }}
+          ${{ reservation.base_rate }}
+        </td>
+        <td class="text-right">
+          ${{ total_reserva }}
         </td>
       </tr>
     </tbody>
   </table>
 
-  <table class="totales">
-    <tr>
-      <th>Total reserva</th>
-      <td class="text-right">${{ total_reserva }}</td>
-    </tr>
-    <tr>
-      <th>Pagado antes de este pago</th>
-      <td class="text-right">${{ total_pagado_antes }}</td>
-    </tr>
-    <tr>
-      <th>Este pago</th>
-      <td class="text-right">${{ payment.amount }}</td>
-    </tr>
-    <tr>
-      <th>Total pagado a la fecha</th>
-      <td class="text-right">
-        ${{ total_pagado_despues }}
-      </td>
-    </tr>
-    <tr>
-      <th>Saldo pendiente</th>
-      <td class="text-right">
-        ${{ saldo_pendiente }}
-      </td>
-    </tr>
-  </table>
+  <!-- Servicios adicionales -->
+  <h4 class="mt-3 mb-1">Servicios adicionales</h4>
+  {% if consumos_servicios %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Servicio</th>
+          <th class="text-center">Cantidad</th>
+          <th class="text-right">Precio unitario</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in consumos_servicios %}
+          <tr>
+            <td class="muted">
+              {{ c.creado_en|date:"Y-m-d H:i" }}
+            </td>
+            <td>
+              {{ c.servicio.nombre }}
+              {% if c.notas %}
+                <div class="muted" style="font-size: 10px;">
+                  {{ c.notas|truncatechars:80 }}
+                </div>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              {{ c.cantidad }}
+            </td>
+            <td class="text-right">
+              ${{ c.precio_unitario }}
+            </td>
+            <td class="text-right">
+              ${{ c.total }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="muted mt-1">
+      No se registran servicios adicionales para esta reserva.
+    </div>
+  {% endif %}
 
-  <div style="clear: both;"></div>
+  <!-- Resumen financiero -->
+  <h4 class="mt-3 mb-1">Resumen financiero</h4>
+  <table class="table">
+    <tbody>
+      <tr>
+        <th style="width: 60%;">Total alojamiento</th>
+        <td class="text-right" style="width: 40%;">${{ total_reserva }}</td>
+      </tr>
+      <tr>
+        <th>Total servicios</th>
+        <td class="text-right">${{ total_servicios }}</td>
+      </tr>
+      <tr>
+        <th>Total general (alojamiento + servicios)</th>
+        <td class="text-right">${{ total_general }}</td>
+      </tr>
+      <tr>
+        <th colspan="2" class="muted">Pagos de alojamiento (reserva)</th>
+      </tr>
+      <tr>
+        <td class="text-right">Pagado antes de este pago</td>
+        <td class="text-right">${{ total_pagado_reserva_antes }}</td>
+      </tr>
+      <tr>
+        <td class="text-right">Este pago</td>
+        <td class="text-right">${{ pago_actual_reserva }}</td>
+      </tr>
+      <tr>
+        <td class="text-right">Total pagado alojamiento</td>
+        <td class="text-right">${{ total_pagado_reserva_despues }}</td>
+      </tr>
+      <tr>
+        <th colspan="2" class="muted">Pagos de servicios</th>
+      </tr>
+      <tr>
+        <td class="text-right">Total pagado en servicios</td>
+        <td class="text-right">${{ total_pagado_servicios }}</td>
+      </tr>
+      <tr>
+        <th>Total pagado (alojamiento + servicios)</th>
+        <td class="text-right">${{ total_pagado_general }}</td>
+      </tr>
+      <tr>
+        <th>Saldo pendiente</th>
+        <td class="text-right">${{ saldo_pendiente }}</td>
+      </tr>
+    </tbody>
+  </table>
 
   <div class="mt-3 muted">
     Este documento es una representación de la factura generada por el sistema de gestión del hotel.

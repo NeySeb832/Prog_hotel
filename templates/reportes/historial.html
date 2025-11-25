@@ -1,0 +1,105 @@
+{% extends "admin_hotel/base_admin.html" %}
+
+{% block title %}Historial de reportes · HotelManager{% endblock %}
+
+{% block page_title %}Historial de reportes PDF{% endblock %}
+{% block page_subtitle %}
+  Consulta y descarga de reportes generados previamente.
+{% endblock %}
+
+{% block content %}
+
+<form method="get" class="mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">Tipo de reporte</label>
+      <select name="tipo" class="form-select">
+        <option value="">Todos</option>
+        {% for value, label in tipos %}
+          <option value="{{ value }}" {% if tipo_filtro == value %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Fecha desde (creación)</label>
+      <input type="date"
+             name="start"
+             value="{{ start_date|date:'Y-m-d' }}"
+             class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Fecha hasta (creación)</label>
+      <input type="date"
+             name="end"
+             value="{{ end_date|date:'Y-m-d' }}"
+             class="form-control">
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-dark w-100" type="submit">
+        <i class="bi bi-funnel"></i> Filtrar
+      </button>
+      <a href="{% url 'reportes:historial' %}" class="btn btn-outline-secondary w-100">
+        Limpiar
+      </a>
+    </div>
+  </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha de creación</th>
+            <th>Tipo</th>
+            <th>Periodo</th>
+            <th>Resumen</th>
+            <th>Generado por</th>
+            <th class="text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in reportes %}
+          <tr>
+            <td class="small">
+              {{ r.creado_el|date:"Y-m-d" }}<br>
+              <span class="text-muted">{{ r.creado_el|time:"H:i" }}</span>
+            </td>
+            <td>{{ r.get_tipo_display }}</td>
+            <td class="small">
+              {{ r.fecha_inicio|date:"d/m/Y" }} → {{ r.fecha_fin|date:"d/m/Y" }}
+            </td>
+            <td class="small">
+              {{ r.total_reservas }} reserva{{ r.total_reservas|pluralize }},
+              ${{ r.ingresos_totales|floatformat:0 }} en ingresos
+            </td>
+            <td class="small">
+              {% if r.usuario %}
+                {{ r.usuario.get_full_name|default:r.usuario.username }}
+              {% else %}
+                Sistema
+              {% endif %}
+            </td>
+            <td class="text-end">
+              <a href="{% url 'reportes:descargar_pdf' r.pk %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-download"></i> Descargar
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted small py-3">
+              No hay reportes que cumplan con los filtros.
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

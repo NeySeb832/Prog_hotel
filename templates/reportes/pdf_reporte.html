@@ -1,0 +1,145 @@
+{% load static %}
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Reporte {{ tipo }}</title>
+  <style>
+    body{
+      font-family: DejaVu Sans, Arial, sans-serif;
+      font-size: 11px;
+      color:#111827;
+    }
+    h1,h2,h3,h4{
+      margin:0;
+      padding:0;
+    }
+    .header{
+      border-bottom:1px solid #d1d5db;
+      margin-bottom:10px;
+      padding-bottom:5px;
+    }
+    .muted{ color:#6b7280; }
+    .kpis{
+      width:100%;
+      border-collapse:collapse;
+      margin-bottom:10px;
+    }
+    .kpis th, .kpis td{
+      border:1px solid #e5e7eb;
+      padding:4px 6px;
+    }
+    .kpis th{
+      background:#f9fafb;
+    }
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:8px;
+      margin-bottom:10px;
+    }
+    .table th, .table td{
+      border:1px solid #e5e7eb;
+      padding:3px 5px;
+    }
+    .table th{
+      background:#f3f4f6;
+    }
+    .small{ font-size:9px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>Reporte {{ tipo }}</h2>
+    <div class="muted small">
+      Generado por: {{ usuario.get_full_name|default:usuario.username|default:"Sistema" }}<br>
+      Periodo: {{ start_date|date:"d/m/Y" }} al {{ end_date|date:"d/m/Y" }}
+    </div>
+  </div>
+
+  <table class="kpis">
+    <tr>
+      <th>Total reservas</th>
+      <th>Ingresos totales</th>
+      <th>Ticket promedio</th>
+      <th>Habitaciones registradas</th>
+    </tr>
+    <tr>
+      <td>{{ total_reservas }}</td>
+      <td>${{ ingresos_totales|floatformat:0 }}</td>
+      <td>${{ ticket_promedio|floatformat:0 }}</td>
+      <td>{{ total_habitaciones }}</td>
+    </tr>
+  </table>
+
+  <h4>Reservas por estado</h4>
+  <table class="table small">
+    <thead>
+      <tr>
+        <th>Estado</th>
+        <th>Cantidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Pendiente</td><td>{{ reservas_por_estado.PENDING|default:0 }}</td></tr>
+      <tr><td>Confirmada</td><td>{{ reservas_por_estado.CONFIRMED|default:0 }}</td></tr>
+      <tr><td>Check-in</td><td>{{ reservas_por_estado.CHECKED_IN|default:0 }}</td></tr>
+      <tr><td>Check-out</td><td>{{ reservas_por_estado.CHECKED_OUT|default:0 }}</td></tr>
+      <tr><td>Cancelada</td><td>{{ reservas_por_estado.CANCELLED|default:0 }}</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Reservas (máx. 50)</h4>
+  <table class="table small">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Huésped</th>
+        <th>Habitación</th>
+        <th>Fechas</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reservas_list %}
+        <tr>
+          <td>{{ r.code|default:"—" }}</td>
+          <td>{{ r.guest_name|default:"Sin nombre" }}</td>
+          <td>Hab. {{ r.room.codigo }}</td>
+          <td>{{ r.check_in|date:"d/m" }} → {{ r.check_out|date:"d/m" }}</td>
+          <td>{{ r.get_status_display }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" class="small muted">No hay reservas en el rango.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h4>Pagos (máx. 50)</h4>
+  <table class="table small">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Reserva</th>
+        <th>Monto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in pagos_list %}
+        <tr>
+          <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ p.reservation.code|default:"SIN-COD" }}</td>
+          <td>${{ p.amount|floatformat:0 }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3" class="small muted">No hay pagos en el rango.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,128 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}Solicitar servicio · Hotel Elegance{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">Solicitar servicio</h1>
+    <p class="text-muted mb-0">
+      Elige la reserva y el servicio que deseas solicitar.
+    </p>
+  </div>
+  <div>
+    <a href="{% url 'servicios:cliente_mis_servicios' %}"
+       class="btn btn-outline-secondary btn-sm">
+      Volver a mis servicios
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <!-- Reserva -->
+        <div class="col-md-6">
+          <label for="id_reserva" class="form-label fw-semibold">Reserva</label>
+          <select name="reserva_id" id="id_reserva" class="form-select" required>
+            <option value="">Selecciona una reserva…</option>
+            {% for r in reservas %}
+              <option value="{{ r.id }}"
+                {% if form_data.reserva_id == r.id|stringformat:"s" %}
+                  selected
+                {% endif %}
+              >
+                {{ r.code }} · Hab {{ r.room.codigo }}
+                {% if r.room.tipo %}
+                  ({{ r.room.tipo.nombre }})
+                {% endif %}
+                · {{ r.check_in }} → {{ r.check_out }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Solo se muestran tus reservas activas o recientes.
+          </div>
+        </div>
+
+        <!-- Servicio -->
+        <div class="col-md-6">
+          <label for="id_servicio" class="form-label fw-semibold">Servicio</label>
+          <select name="servicio_id" id="id_servicio" class="form-select" required>
+            <option value="">Selecciona un servicio…</option>
+            {% for s in servicios %}
+              <option value="{{ s.id }}"
+                {% if form_data.servicio_id == s.id|stringformat:"s" %}
+                  selected
+                {% endif %}
+              >
+                {{ s.nombre }}
+                · {{ s.get_categoria_display }}
+                · ${{ s.precio_base }}
+              </option>
+            {% endfor %}
+          </select>
+          <div class="form-text">
+            Solo se muestran servicios activos.
+          </div>
+        </div>
+
+        <!-- Cantidad -->
+        <div class="col-md-4">
+          <label for="id_cantidad" class="form-label fw-semibold">Cantidad</label>
+          <input
+            type="number"
+            name="cantidad"
+            id="id_cantidad"
+            class="form-control"
+            min="1"
+            required
+            value="{% if form_data.cantidad %}{{ form_data.cantidad }}{% else %}1{% endif %}"
+          >
+          <div class="form-text">
+            Ej: número de platos, prendas de lavandería, traslados, etc.
+          </div>
+        </div>
+
+        <!-- Notas -->
+        <div class="col-md-8">
+          <label for="id_notas" class="form-label fw-semibold">
+            Notas para el hotel (opcional)
+          </label>
+          <textarea
+            name="notas"
+            id="id_notas"
+            rows="3"
+            class="form-control"
+            placeholder="Indica detalles especiales: horario preferido, alergias, indicaciones, etc."
+          >{% if form_data.notas %}{{ form_data.notas }}{% endif %}</textarea>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-between flex-wrap gap-2">
+        <div class="text-muted small">
+          Tu solicitud se registrará como <strong>Pendiente</strong>.
+          El hotel podrá aprobarla, atenderla y facturarla según corresponda.
+        </div>
+        <div class="d-flex gap-2">
+          <a href="{% url 'servicios:cliente_mis_servicios' %}"
+             class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            Solicitar servicio
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}

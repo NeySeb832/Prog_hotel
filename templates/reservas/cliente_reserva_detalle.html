@@ -1,0 +1,176 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}Detalle reserva {{ reserva.code }} · Hotel Elegance{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">Detalles de Reserva · {{ reserva.code }}</h1>
+    <p class="text-muted mb-0">
+      Información completa de tu reserva.
+    </p>
+  </div>
+  <div>
+    <a href="{% url 'reservas:mis_reservas' %}" class="btn btn-outline-secondary btn-sm">
+      Volver a mis reservas
+    </a>
+  </div>
+</div>
+
+<!-- Bloque huésped + estancia -->
+<div class="row g-3 mb-3">
+  <!-- Información huésped -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold">
+        Información del huésped
+      </div>
+      <div class="card-body">
+        <p class="mb-1">
+          <span class="text-muted">Nombre:</span><br>
+          <strong>{{ reserva.guest_name }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="text-muted">Email:</span><br>
+          <strong>{{ reserva.guest_email|default:"—" }}</strong>
+        </p>
+        <p class="mb-0">
+          <span class="text-muted">Teléfono:</span><br>
+          <strong>{{ reserva.guest_phone|default:"—" }}</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalles estancia -->
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-header fw-semibold">
+        Detalles de estancia
+      </div>
+      <div class="card-body">
+        <p class="mb-1">
+          <span class="text-muted">Habitación:</span><br>
+          <strong>
+            {{ reserva.room.codigo }}
+            {% if reserva.room.tipo %} – {{ reserva.room.tipo.nombre }}{% endif %}
+          </strong>
+        </p>
+        <p class="mb-1">
+          <span class="text-muted">Check-in:</span>
+          <strong>{{ reserva.check_in }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="text-muted">Check-out:</span>
+          <strong>{{ reserva.check_out }}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="text-muted">Huéspedes:</span>
+          <strong>{{ reserva.adults }} adultos{% if reserva.children %}, {{ reserva.children }} niños{% endif %}</strong>
+        </p>
+        <p class="mb-1">
+          <span class="text-muted">Noches:</span>
+          <strong>{{ reserva.nights }}</strong>
+        </p>
+        <p class="mb-0">
+          <span class="text-muted">Estado de la reserva:</span>
+          <span class="badge bg-secondary ms-1">
+            {{ reserva.get_status_display }}
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Información financiera -->
+<div class="card shadow-sm mb-3">
+  <div class="card-header fw-semibold">
+    Información financiera
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="text-muted small text-uppercase mb-1">Tarifa por noche</div>
+        <div class="fw-semibold">${{ reserva.base_rate }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small text-uppercase mb-1">Noches</div>
+        <div class="fw-semibold">{{ reserva.nights }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small text-uppercase mb-1">Total estimado</div>
+        <div class="fw-semibold">${{ reserva.total_amount }}</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small text-uppercase mb-1">Pagado</div>
+        <div class="fw-semibold">${{ reserva.paid_amount }}</div>
+        <div class="text-muted">
+          Saldo pendiente:
+          {% if reserva.pending_amount > 0 %}
+            <span class="text-danger fw-semibold">${{ reserva.pending_amount }}</span>
+          {% else %}
+            <span class="text-success fw-semibold">$0</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pagos / facturas -->
+<div class="card shadow-sm mb-3">
+  <div class="card-header fw-semibold">
+    Pagos registrados / Facturas
+  </div>
+  <div class="card-body p-0">
+    {% if pagos %}
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha</th>
+              <th>Factura</th>
+              <th>Método</th>
+              <th class="text-end">Monto</th>
+              <th>Referencia</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in pagos %}
+              <tr>
+                <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+                <td class="fw-semibold">{{ p.invoice_number }}</td>
+                <td>{{ p.get_method_display }}</td>
+                <td class="text-end fw-semibold">${{ p.amount }}</td>
+                <td>{{ p.reference|default:"—" }}</td>
+                <td class="text-center">
+                  <a href="{% url 'reservas:pago_factura' p.pk %}"
+                     class="btn btn-outline-primary btn-sm" target="_blank">
+                    <i class="bi bi-file-earmark-text me-1"></i> Ver factura
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="p-3 mb-0 text-muted">
+        Todavía no hay pagos registrados para esta reserva.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Acciones inferiores (solo lectura por ahora) -->
+<div class="d-flex flex-wrap gap-2">
+  <a href="{% url 'reservas:mis_reservas' %}" class="btn btn-outline-secondary btn-sm">
+    Volver a mis reservas
+  </a>
+  {# Si quisieras permitir modificar/cancelar desde aquí, puedes reutilizar las mismas URLs que en el listado #}
+</div>
+
+{% endblock %}

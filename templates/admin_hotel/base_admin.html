@@ -34,7 +34,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
-      <i class="bi bi-buildings fs-5"></i> HotelManager
+      <i class="bi bi-buildings fs-5"></i> {{ config_general.hotel_nombre|default:"HotelManager" }}
     </div>
     <div class="section-hint">Gestión hotelera</div>
 
@@ -53,6 +53,12 @@
          href="{{ operaciones_url|default:'/operaciones/' }}">
         <i class="bi bi-clipboard2-check"></i> Operaciones
       </a>
+
+        <a class="nav-link {% if active_menu == 'servicios' %}active{% endif %}"
+         href="{{ servicios_url|default:'/servicios/' }}">
+        <i class="bi bi-bag-check"></i> Servicios
+      </a>
+
 
       <a class="nav-link {% if active_menu == 'clientes' %}active{% endif %}"
          href="{{ clientes_url|default:'/clientes/' }}">

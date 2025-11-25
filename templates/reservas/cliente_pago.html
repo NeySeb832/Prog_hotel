@@ -1,0 +1,139 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}Pagar reserva {{ reserva.code }} · Hotel Elegance{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">Pago de reserva · {{ reserva.code }}</h1>
+    <p class="text-muted mb-0">
+      Saldo pendiente actual: 
+      {% if saldo_pendiente %}
+        <strong>${{ saldo_pendiente }}</strong>
+      {% else %}
+        <strong>$0</strong>
+      {% endif %}
+    </p>
+  </div>
+  <div>
+    <a href="{% url 'reservas:detalle_cliente' reserva.pk %}"
+       class="btn btn-outline-secondary btn-sm">
+      Volver al detalle
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Resumen de la reserva</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="text-muted small text-uppercase mb-1">Habitación</div>
+        <div class="fw-semibold">
+          {{ reserva.room.codigo }}
+          {% if reserva.room.tipo %}
+            · {{ reserva.room.tipo.nombre }}
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small text-uppercase mb-1">Fechas</div>
+        <div class="fw-semibold">
+          {{ reserva.check_in }} → {{ reserva.check_out }}
+          ({{ reserva.nights }} noches)
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-muted small text-uppercase mb-1">Importe</div>
+        <div>Total estimado: <strong>${{ reserva.total_amount }}</strong></div>
+        <div>Pagado: <strong>${{ reserva.paid_amount }}</strong></div>
+        <div>
+          Saldo pendiente:
+          {% if saldo_pendiente %}
+            <strong class="text-danger">${{ saldo_pendiente }}</strong>
+          {% else %}
+            <strong class="text-success">$0</strong>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Registrar pago</h5>
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="id_amount" class="form-label fw-semibold">Monto a pagar</label>
+          <input
+            type="number"
+            name="amount"
+            id="id_amount"
+            class="form-control"
+            min="0"
+            step="0.01"
+            {% if saldo_pendiente %}
+              value="{{ saldo_pendiente }}"
+            {% endif %}
+            required
+          >
+          <div class="form-text">
+            No puede ser mayor al saldo pendiente.
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label for="id_method" class="form-label fw-semibold">Método de pago</label>
+          <select name="method" id="id_method" class="form-select">
+            <option value="CASH">Efectivo</option>
+            <option value="CARD">Tarjeta</option>
+            <option value="TRANSFER">Transferencia</option>
+            <option value="OTHER">Otro</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label for="id_reference" class="form-label fw-semibold">Referencia</label>
+          <input
+            type="text"
+            name="reference"
+            id="id_reference"
+            class="form-control"
+            placeholder="N° comprobante, referencia bancaria, etc."
+          >
+        </div>
+
+        <div class="col-12">
+          <label for="id_notes" class="form-label fw-semibold">Notas (opcional)</label>
+          <textarea
+            name="notes"
+            id="id_notes"
+            rows="2"
+            class="form-control"
+            placeholder="Información adicional sobre este pago"
+          ></textarea>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex justify-content-end gap-2">
+        <a href="{% url 'reservas:detalle_cliente' reserva.pk %}"
+           class="btn btn-outline-secondary">
+          Cancelar
+        </a>
+        <button type="submit" class="btn btn-success">
+          Procesar pago
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

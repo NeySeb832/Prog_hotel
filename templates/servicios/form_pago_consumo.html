@@ -1,0 +1,116 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Registrar pago de servicio · HotelManager{% endblock %}
+
+{% block extra_head %}
+<style>
+  .svc-card {
+    border-radius: .75rem;
+    border: 1px solid rgba(0,0,0,.05);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+    padding: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}Registrar pago de servicio{% endblock %}
+{% block page_subtitle %}
+  Registra un pago asociado al consumo de servicio de la reserva.
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="svc-card mb-3">
+      <h6 class="mb-2">Resumen del consumo</h6>
+      <div class="mb-1">
+        <strong>Reserva:</strong>
+        {{ consumo.reserva.code }} · Hab {{ consumo.reserva.room.codigo }}
+      </div>
+      <div class="mb-1">
+        <strong>Huésped:</strong>
+        {{ consumo.reserva.guest_name|default:"Sin nombre" }}
+      </div>
+      <div class="mb-1">
+        <strong>Servicio:</strong>
+        {{ consumo.servicio.nombre }}
+      </div>
+      <div class="mb-1">
+        <strong>Cantidad:</strong> {{ consumo.cantidad }}
+      </div>
+      <div class="mb-1">
+        <strong>Total consumo:</strong> {{ consumo.total }}
+      </div>
+      <div class="mb-1">
+        <strong>Total pagado:</strong> {{ consumo.total_pagado }}
+      </div>
+      <div class="mb-1">
+        <strong>Saldo pendiente:</strong> {{ consumo.saldo_pendiente }}
+      </div>
+      <div class="mt-2 text-muted small">
+        Estado actual: {{ consumo.get_estado_display }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="svc-card">
+      <h6 class="mb-3">Datos del pago</h6>
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger py-2">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label">Monto a pagar</label>
+          {{ form.amount }}
+          {% if form.amount.errors %}
+            <div class="text-danger small">{{ form.amount.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Método de pago</label>
+          {{ form.method }}
+          {% if form.method.errors %}
+            <div class="text-danger small">{{ form.method.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Referencia (opcional)</label>
+          {{ form.reference }}
+          {% if form.reference.errors %}
+            <div class="text-danger small">{{ form.reference.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Notas (opcional)</label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+            <div class="text-danger small">{{ form.notes.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'servicios:consumos' %}" class="btn btn-outline-secondary">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-cash-coin me-1"></i> Registrar pago
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

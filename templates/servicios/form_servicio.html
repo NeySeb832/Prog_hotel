@@ -1,0 +1,86 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}{% if modo == 'editar' %}Editar servicio{% else %}Nuevo servicio{% endif %} · HotelManager{% endblock %}
+
+{% block extra_head %}
+<style>
+  .svc-card {
+    border-radius: .75rem;
+    border: 1px solid rgba(0,0,0,.05);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+    padding: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}
+  {% if modo == 'editar' %}Editar servicio{% else %}Nuevo servicio{% endif %}
+{% endblock %}
+{% block page_subtitle %}
+  Define la información y precio base del servicio.
+{% endblock %}
+
+{% block content %}
+<div class="svc-card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger py-2">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nombre del servicio</label>
+        {{ form.nombre }}
+        {% if form.nombre.errors %}
+          <div class="text-danger small">{{ form.nombre.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Categoría</label>
+        {{ form.categoria }}
+        {% if form.categoria.errors %}
+          <div class="text-danger small">{{ form.categoria.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Precio base (COP)</label>
+        {{ form.precio_base }}
+        {% if form.precio_base.errors %}
+          <div class="text-danger small">{{ form.precio_base.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-12">
+        <label class="form-label">Descripción</label>
+        {{ form.descripcion }}
+        {% if form.descripcion.errors %}
+          <div class="text-danger small">{{ form.descripcion.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          {{ form.activo }}
+          <label class="form-check-label ms-1">Servicio activo</label>
+        </div>
+      </div>
+      <div class="col-12 mt-2 d-flex justify-content-between">
+        <a href="{% url 'servicios:lista' %}" class="btn btn-outline-secondary">
+          Cancelar
+        </a>
+        <button type="submit" class="btn btn-dark">
+          {% if modo == 'editar' %}
+            <i class="bi bi-check2 me-1"></i> Guardar cambios
+          {% else %}
+            <i class="bi bi-plus-lg me-1"></i> Crear servicio
+          {% endif %}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

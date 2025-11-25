@@ -17,11 +17,8 @@
 </head>
 <body>
   <div class="container py-5">
-    <div class="auth-card p-4 shadow-sm">
-      <div class="d-flex align-items-center mb-2">
-        <a href="/" class="small text-decoration-none"><i class="bi bi-arrow-left"></i> Volver al sitio web</a>
-      </div>
-      <div class="text-center">
+    <div class="auth-card p-4 p-md-5 shadow-sm">
+      <div class="text-center mb-4">
         <div class="display-6 mb-2"><i class="bi bi-person-circle"></i></div>
         <div class="fw-semibold">Crear Cuenta</div>
         <div class="text-muted small mb-3">Registrarse en Hotel Elegance</div>
@@ -33,23 +30,23 @@
         {% endfor %}
       {% endif %}
 
-      <form method="post" class="needs-validation" novalidate>
+      <form method="post" class="needs-validation" novalIDate>
         {% csrf_token %}
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Nombre</label>
-            <input type="text" name="first_name" class="form-control" placeholder="Juan" required>
+            <input type="text" name="first_name" value="{{ first_name|default:'' }}" class="form-control" placeholder="Juan" required>
             <div class="invalid-feedback">Ingresa tu nombre.</div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Apellido</label>
-            <input type="text" name="last_name" class="form-control" placeholder="Pérez" required>
+            <input type="text" name="last_name" value="{{ last_name|default:'' }}" class="form-control" placeholder="Pérez" required>
             <div class="invalid-feedback">Ingresa tu apellido.</div>
           </div>
 
           <div class="col-12">
             <label class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" placeholder="tu@email.com" required>
+            <input type="email" name="email" value="{{ email|default:'' }}" class="form-control" placeholder="tu@email.com" required>
             <div class="invalid-feedback">Ingresa un email válido.</div>
           </div>
 
@@ -87,7 +84,7 @@
       </form>
 
       <div class="text-center small mt-3">
-        ¿Ya tienes una cuenta? <a href="/login/">Iniciar sesión</a>
+        ¿Ya tienes una cuenta? <a href="{% url 'accounts:login' %}">Iniciar sesión</a>
       </div>
     </div>
   </div>
@@ -96,8 +93,16 @@
   <script>
     (function(){
       const t1=document.getElementById('toggle1'), t2=document.getElementById('toggle2');
-      t1.addEventListener('click',()=>{const i=document.getElementById('pwd1'); i.type=i.type==='password'?'text':'password'; t1.firstElementChild.className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';});
-      t2.addEventListener('click',()=>{const i=document.getElementById('pwd2'); i.type=i.type==='password'?'text':'password'; t2.firstElementChild.className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';});
+      t1.addEventListener('click',()=>{
+        const i=document.getElementById('pwd1');
+        i.type=i.type==='password'?'text':'password';
+        t1.firstElementChild.className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';
+      });
+      t2.addEventListener('click',()=>{
+        const i=document.getElementById('pwd2');
+        i.type=i.type==='password'?'text':'password';
+        t2.firstElementChild.className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';
+      });
       const forms=document.querySelectorAll('.needs-validation');
       Array.from(forms).forEach(form=>form.addEventListener('submit',e=>{
         if(!form.checkValidity()){ e.preventDefault(); e.stopPropagation(); }

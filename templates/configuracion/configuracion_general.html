@@ -1,0 +1,230 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}Configuración · HotelManager{% endblock %}
+
+{% block page_title %}Configuración y parametrización{% endblock %}
+{% block page_subtitle %}
+  Ajusta parámetros generales que afectan a todo el sistema.
+{% endblock %}
+
+{% block extra_head %}
+  <style>
+    .card-config{
+      border-radius:14px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+    }
+    .card-config .card-header{
+      border-bottom:1px solid #e5e7eb;
+      background:#f9fafb;
+      border-radius:14px 14px 0 0;
+    }
+    .small-muted{
+      font-size:.8rem;
+      color:#6b7280;
+    }
+    .field-errors{
+      font-size:.8rem;
+      color:#b91c1c;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-xl-8">
+    <div class="card card-config shadow-sm">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <div>
+          <div class="fw-semibold">Configuración general</div>
+          <div class="small-muted">
+            Estos valores se aplican a reservas, operaciones y reportes.
+          </div>
+        </div>
+        {% if guardado %}
+          <span class="badge bg-success-subtle text-success border border-success-subtle">
+            Cambios guardados
+          </span>
+        {% endif %}
+      </div>
+
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger small">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <h6 class="mb-2">Datos del hotel</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-12">
+              <label class="form-label" for="{{ form.hotel_nombre.id_for_label }}">
+                Nombre comercial del hotel
+              </label>
+              {{ form.hotel_nombre }}
+              {% if form.hotel_nombre.errors %}
+                <div class="field-errors">{{ form.hotel_nombre.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="{{ form.hotel_eslogan.id_for_label }}">
+                Eslogan
+              </label>
+              {{ form.hotel_eslogan }}
+              {% if form.hotel_eslogan.errors %}
+                <div class="field-errors">{{ form.hotel_eslogan.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.hotel_email.id_for_label }}">
+                Correo de contacto
+              </label>
+              {{ form.hotel_email }}
+              {% if form.hotel_email.errors %}
+                <div class="field-errors">{{ form.hotel_email.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.hotel_telefono.id_for_label }}">
+                Teléfono
+              </label>
+              {{ form.hotel_telefono }}
+              {% if form.hotel_telefono.errors %}
+                <div class="field-errors">{{ form.hotel_telefono.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label" for="{{ form.hotel_direccion.id_for_label }}">
+                Dirección
+              </label>
+              {{ form.hotel_direccion }}
+              {% if form.hotel_direccion.errors %}
+                <div class="field-errors">{{ form.hotel_direccion.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Parámetros de localización</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.moneda.id_for_label }}">
+                Moneda por defecto
+              </label>
+              {{ form.moneda }}
+              {% if form.moneda.errors %}
+                <div class="field-errors">{{ form.moneda.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.zona_horaria.id_for_label }}">
+                Zona horaria
+              </label>
+              {{ form.zona_horaria }}
+              <div class="small-muted mt-1">
+                Ejemplo: <code>America/Bogota</code>
+              </div>
+              {% if form.zona_horaria.errors %}
+                <div class="field-errors">{{ form.zona_horaria.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Políticas de check-in / check-out</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.hora_checkin.id_for_label }}">
+                Hora estándar de check-in
+              </label>
+              {{ form.hora_checkin }}
+              {% if form.hora_checkin.errors %}
+                <div class="field-errors">{{ form.hora_checkin.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label" for="{{ form.hora_checkout.id_for_label }}">
+                Hora estándar de check-out
+              </label>
+              {{ form.hora_checkout }}
+              {% if form.hora_checkout.errors %}
+                <div class="field-errors">{{ form.hora_checkout.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Impuestos y cargos</h6>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.iva_porcentaje.id_for_label }}">
+                IVA (%)
+              </label>
+              {{ form.iva_porcentaje }}
+              {% if form.iva_porcentaje.errors %}
+                <div class="field-errors">{{ form.iva_porcentaje.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.cargo_servicio_porcentaje.id_for_label }}">
+                Cargo por servicio (%)
+              </label>
+              {{ form.cargo_servicio_porcentaje }}
+              {% if form.cargo_servicio_porcentaje.errors %}
+                <div class="field-errors">{{ form.cargo_servicio_porcentaje.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label" for="{{ form.horas_min_cancelacion_sin_penalidad.id_for_label }}">
+                Horas mínimas para cancelar sin penalidad
+              </label>
+              {{ form.horas_min_cancelacion_sin_penalidad }}
+              {% if form.horas_min_cancelacion_sin_penalidad.errors %}
+                <div class="field-errors">{{ form.horas_min_cancelacion_sin_penalidad.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-2">Políticas de reservas</h6>
+          <div class="form-check form-switch mb-3">
+            {{ form.permitir_overbooking }}
+            <label class="form-check-label ms-2" for="{{ form.permitir_overbooking.id_for_label }}">
+              Permitir overbooking (reservas por encima de la capacidad nominal)
+            </label>
+            {% if form.permitir_overbooking.errors %}
+              <div class="field-errors">{{ form.permitir_overbooking.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-dark">
+              Guardar cambios
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-footer small-muted">
+        Última actualización: {{ config.actualizado_el|date:"d/m/Y H:i" }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

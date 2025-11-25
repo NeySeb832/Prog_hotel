@@ -1,0 +1,110 @@
+{% extends "admin_hotel/base_admin.html" %}
+{% load static %}
+
+{% block title %}
+  {% if modo == "editar" %}
+    Editar consumo de servicio · HotelManager
+  {% else %}
+    Registrar consumo de servicio · HotelManager
+  {% endif %}
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .svc-card {
+    border-radius: .75rem;
+    border: 1px solid rgba(0,0,0,.05);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+    padding: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block page_title %}
+  {% if modo == "editar" %}
+    Editar consumo de servicio
+  {% else %}
+    Registrar consumo de servicio
+  {% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+  {% if modo == "editar" %}
+    Actualiza los datos del consumo (estado, cantidad, notas, etc.).
+  {% else %}
+    Asocia un nuevo consumo de servicio a una reserva existente.
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="svc-card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger py-2">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Reserva</label>
+        {{ form.reserva }}
+        {% if form.reserva.errors %}
+          <div class="text-danger small">{{ form.reserva.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Servicio</label>
+        {{ form.servicio }}
+        {% if form.servicio.errors %}
+          <div class="text-danger small">{{ form.servicio.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Cantidad</label>
+        {{ form.cantidad }}
+        {% if form.cantidad.errors %}
+          <div class="text-danger small">{{ form.cantidad.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Precio unitario (COP)</label>
+        {{ form.precio_unitario }}
+        {% if form.precio_unitario.errors %}
+          <div class="text-danger small">{{ form.precio_unitario.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Estado</label>
+        {{ form.estado }}
+        {% if form.estado.errors %}
+          <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-8">
+        <label class="form-label">Notas (opcional)</label>
+        {{ form.notas }}
+        {% if form.notas.errors %}
+          <div class="text-danger small">{{ form.notas.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-12 mt-2 d-flex justify-content-between">
+        <a href="{% url 'servicios:consumos' %}" class="btn btn-outline-secondary">
+          Cancelar
+        </a>
+        <button type="submit" class="btn btn-dark">
+          <i class="bi bi-check2 me-1"></i>
+          {% if modo == "editar" %}
+            Actualizar consumo
+          {% else %}
+            Guardar consumo
+          {% endif %}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

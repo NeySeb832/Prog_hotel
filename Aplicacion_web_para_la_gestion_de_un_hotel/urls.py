@@ -40,5 +40,11 @@ urlpatterns = [
 
     path("clientes/", include("clientes.urls")),
 
+    path('reportes/', include('reportes.urls')),
+
+    path("configuracion/", include("configuracion.urls")),
+
+    path("servicios/", include("servicios.urls")),
+
 
     ]

@@ -5,7 +5,52 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cde98260-34b1-46db-bca2-aab09d506909" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/configuracion/context_processors.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/configuracion/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/configuracion/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/habitaciones/helpers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reportes/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/reportes/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/servicios/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/servicios/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/configuracion/configuracion_general.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reportes/historial.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reportes/pdf_reporte.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reportes/resumen.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_mis_reservas.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_nueva.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_pago.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_reserva_detalle.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_room_service.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_servicios.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_mis_servicios.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_detalle.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_nuevo.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_pago.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/form_consumo.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/form_pago_consumo.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/form_servicio.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/lista_consumos.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/servicios/lista_servicios.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reservas/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reservas/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reservas/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/portal_cliente.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/portal_cliente.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/accounts/registro.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/registro.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_hotel/base_admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_hotel/base_admin.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_hotel/reservas.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/base_cliente.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/contacto.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/contacto.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/nuestras_habitaciones.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/nuestras_habitaciones.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/nuestros_servicios.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/nuestros_servicios.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/dashboard/sobre_nosotros.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/sobre_nosotros.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/reservas/factura_pago.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/reservas/factura_pago.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +63,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -37,37 +82,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Django Server.Aplicacion web para la gestion de un hotel.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.pycharm.django.structure.promotion.once.per.project": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/seb83/Documents/Universidad/Arquitectura de sistemas 1/Proyecto/Aplicacion web para la gestion de un hotel",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Django Server.Aplicacion web para la gestion de un hotel.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.pycharm.django.structure.promotion.once.per.project&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/seb83/Documents/Universidad/Arquitectura de sistemas 1/Proyecto/Aplicacion web para la gestion de un hotel&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Aplicacion web para la gestion de un hotel" type="Python.DjangoServer" factoryName="Django server">
       <module name="Aplicacion web para la gestion de un hotel" />
@@ -129,11 +174,35 @@
       <workItem from="1763338082268" duration="11211000" />
       <workItem from="1763422951375" duration="13600000" />
       <workItem from="1763572160476" duration="159000" />
-      <workItem from="1763596597537" duration="3662000" />
+      <workItem from="1763596597537" duration="5180000" />
+      <workItem from="1763647260072" duration="2743000" />
+      <workItem from="1763840234525" duration="11519000" />
+      <workItem from="1763905245434" duration="19939000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="778cd1f9-a802-4282-9a81-104f113e7617" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="778cd1f9-a802-4282-9a81-104f113e7617">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

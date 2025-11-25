@@ -1,22 +1,29 @@
 <!doctype html>
 <html lang="es">
+{% load static %}
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hotel Elegance — Sobre Nosotros</title>
+  <title>{{ config_general.hotel_nombre|default:"Hotel Elegance" }} — Sobre Nosotros</title>
 
-  <!-- Bootstrap 5 + Icons (CDN) -->
+  <!-- Bootstrap 5 + Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <style>
     :root{
-      --radius: 16px;
-      --brand-dark:#000;
-      --brand-on-dark:#fff;
+      --radius:16px;
+      --border:#e5e7eb;
+      --muted:#6b7280;
+      --soft:#f9fafb;
     }
 
-    /* Navbar interactiva */
+    body{
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:#f3f4f6;
+      color:#111827;
+    }
+
     .navbar-brand i{ margin-right:.5rem; }
     .navbar .nav-link{
       border-radius:999px;
@@ -25,100 +32,140 @@
       transition:background-color .15s ease, color .15s ease;
     }
     .navbar .nav-link:hover,
-    .navbar .nav-link:focus{
-      background-color:var(--brand-dark);
-      color:var(--brand-on-dark) !important;
-      text-decoration:none;
-      outline:none;
-    }
-    .navbar .nav-link.active,
-    .navbar .nav-link[aria-current="page"]{
-      background-color:var(--brand-dark);
-      color:var(--brand-on-dark) !important;
+    .navbar .nav-link.active{
+      background-color:#111827;
+      color:#fff !important;
     }
 
-    /* Encabezado */
-    .section-head{
-      text-align:center;
-      margin:2.2rem 0 1.2rem;
+    .page-header{
+      padding:1.6rem 0 1rem;
     }
-    .section-head h2{ font-weight:700; }
-    .section-head p{ color:#6c757d; max-width:900px; margin:0 auto; }
+    .page-title{
+      font-size:1.6rem;
+      font-weight:700;
+      letter-spacing:-.03em;
+      margin-bottom:.25rem;
+    }
+    .page-subtitle{
+      font-size:.9rem;
+      color:var(--muted);
+      max-width:540px;
+      margin-bottom:0;
+    }
 
-    /* Tarjetas suaves reutilizables */
     .soft-card{
-      border:1px solid rgba(0,0,0,.08);
       border-radius:var(--radius);
+      border:1px solid var(--border);
       background:#fff;
-      padding:22px;
+      padding:1.1rem 1.3rem;
     }
 
-    /* Valores */
-    .value-item{
-      text-align:center;
-      padding:24px 18px;
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:var(--radius);
-      background:#fff;
-      height:100%;
-      transition:transform .15s ease, box-shadow .15s ease;
+    .soft-card h6{
+      font-size:.95rem;
+      font-weight:600;
+      margin-bottom:.4rem;
     }
-    .value-item:hover{
-      transform:translateY(-2px);
-      box-shadow:0 8px 22px rgba(0,0,0,.06);
-    }
-    .value-icon{
-      width:48px; height:48px;
-      display:grid; place-items:center;
-      border-radius:50%;
-      background:#f3f5f8;
-      margin:0 auto 10px auto;
-      font-size:22px; color:#212a3a;
-    }
-    .value-title{ font-weight:600; margin-bottom:4px; }
 
-    /* Línea de tiempo */
+    .soft-card p{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-bottom:.45rem;
+    }
+
+    /* Timeline compacto */
     .timeline{
       position:relative;
-      padding-left:28px;
+      padding-left:1.25rem;
+      margin-bottom:0;
+      list-style:none;
     }
     .timeline::before{
       content:"";
-      position:absolute; left:12px; top:0; bottom:0;
-      width:2px; background:#e7e9ee;
+      position:absolute;
+      left:.28rem;
+      top:.2rem;
+      bottom:.2rem;
+      width:2px;
+      background:#e5e7eb;
     }
-    .t-item{
+    .timeline-item{
       position:relative;
-      margin-bottom:18px;
+      padding-bottom:.7rem;
     }
-    .t-item:last-child{ margin-bottom:0; }
-    .t-dot{
-      position:absolute; left:-2px; top:6px;
-      width:10px; height:10px; border-radius:50%; background:#0d6efd;
-      box-shadow:0 0 0 4px #eaf1ff;
+    .timeline-bullet{
+      position:absolute;
+      left:-.07rem;
+      top:.22rem;
+      width:.55rem;
+      height:.55rem;
+      border-radius:999px;
+      background:#111827;
     }
-    .t-year{ font-weight:700; margin-bottom:4px; }
-    .t-text{ color:#6c757d; margin:0; }
+    .timeline-title{
+      font-size:.85rem;
+      font-weight:600;
+      margin-bottom:.1rem;
+    }
+    .timeline-text{
+      font-size:.8rem;
+      color:var(--muted);
+      margin-bottom:0;
+    }
 
-    /* Métricas */
-    .kpi{
+    /* Equipo directivo compacto */
+    .team-card{
+      border-radius:var(--radius);
+      border:1px solid var(--border);
+      background:#fff;
+      padding:.9rem .9rem;
       text-align:center;
-      padding:18px 10px;
+      height:100%;
     }
-    .kpi .num{
-      font-size:2rem; font-weight:800; line-height:1;
+    .team-avatar{
+      width:52px;
+      height:52px;
+      border-radius:999px;
+      margin:0 auto .4rem;
+      background:#e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:600;
+      font-size:.8rem;
     }
-    .kpi .sub{ color:#6c757d; }
+    .team-name{
+      font-size:.9rem;
+      font-weight:600;
+      margin-bottom:0;
+    }
+    .team-role{
+      font-size:.78rem;
+      color:var(--muted);
+    }
 
-    /* Footer */
-    footer{
-      background:#f3f4f6;
-      border-top:1px solid rgba(0,0,0,.06);
+    /* Footer compacto */
+    .footer{
+      margin-top:1.8rem;
+      padding:1.8rem 0 1.4rem;
+      border-top:1px solid #e5e7eb;
+      background:#fff;
+    }
+    .small-muted{
+      font-size:.8rem;
+      color:var(--muted);
     }
     .footer-bottom{
-      border-top:1px solid rgba(0,0,0,.08);
-      color:#8a93a1;
-      font-size:.9rem;
+      border-top:1px solid #e5e7eb;
+      margin-top:1rem;
+      padding-top:.6rem;
+      font-size:.76rem;
+      color:var(--muted);
+    }
+
+    @media (max-width: 991.98px){
+      .page-header{
+        padding-top:1.2rem;
+      }
     }
   </style>
 </head>
@@ -128,7 +175,7 @@
   <nav class="navbar navbar-expand-lg bg-white border-bottom">
     <div class="container">
       <a class="navbar-brand fw-semibold" href="/">
-        <i class="bi bi-building"></i> Hotel Elegance
+        <i class="bi bi-building"></i> {{ config_general.hotel_nombre|default:"Hotel Elegance" }}
       </a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
@@ -141,197 +188,163 @@
           <li class="nav-item"><a class="nav-link" href="/nuestras_habitaciones/" data-route="habitaciones">Habitaciones</a></li>
           <li class="nav-item"><a class="nav-link" href="/nuestros_servicios/" data-route="servicios">Servicios</a></li>
           <li class="nav-item"><a class="nav-link active" href="/sobre_nosotros/" data-route="nosotros" aria-current="page">Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="/contacto" data-route="contacto">Contacto</a></li>
+          <li class="nav-item"><a class="nav-link" href="/contacto/" data-route="contacto">Contacto</a></li>
         </ul>
-        <a class="btn btn-dark btn-sm rounded-3" href="#"><i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión</a>
+        <a class="btn btn-dark btn-sm rounded-3" href="/login/">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+        </a>
       </div>
     </div>
   </nav>
 
-  <!-- ENCABEZADO -->
-  <header class="container">
-    <div class="section-head">
-      <h2>Sobre Nosotros</h2>
-      <p>
-        Hotel Elegance es un establecimiento de lujo que combina la tradición hotelera con las comodidades
-        modernas. Desde 1985, diseñamos experiencias memorables para viajeros de negocios y placer, con
-        un servicio cercano y auténtico.
+  <!-- CONTENIDO -->
+  <main class="container pb-4">
+    <div class="page-header">
+      <h1 class="page-title">Sobre Nosotros</h1>
+      <p class="page-subtitle">
+        Conoce la historia y el equipo detrás de {{ config_general.hotel_nombre|default:"Hotel Elegance" }},
+        un hotel creado para viajeros que valoran el equilibrio entre diseño, confort y servicio cercano.
       </p>
     </div>
-  </header>
 
-  <!-- MISIÓN & VISIÓN -->
-  <section class="container pb-2">
-    <div class="row g-3">
-      <div class="col-12 col-lg-6">
-        <div class="soft-card h-100">
-          <h6 class="fw-semibold mb-2">Nuestra Misión</h6>
-          <p class="text-muted mb-0">
-            Brindar hospitalidad excepcional que supere las expectativas de nuestros huéspedes, con
-            confort, estilo y atención personalizada que conviertan cada visita en un recuerdo inolvidable.
-          </p>
-        </div>
-      </div>
-      <div class="col-12 col-lg-6">
-        <div class="soft-card h-100">
-          <h6 class="fw-semibold mb-2">Nuestra Visión</h6>
-          <p class="text-muted mb-0">
-            Ser el hotel de referencia en la región por innovación, sostenibilidad y servicio cálido,
-            contribuyendo al desarrollo del turismo responsable.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- VALORES -->
-  <section class="container py-3">
-    <div class="soft-card">
-      <h6 class="fw-semibold mb-3">Nuestros Valores</h6>
-      <div class="row g-3">
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="value-item">
-            <div class="value-icon"><i class="bi bi-award"></i></div>
-            <div class="value-title">Excelencia</div>
-            <p class="text-muted small mb-0">Cuidado por el detalle en cada servicio.</p>
-          </div>
-        </div>
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="value-item">
-            <div class="value-icon"><i class="bi bi-shield-check"></i></div>
-            <div class="value-title">Integridad</div>
-            <p class="text-muted small mb-0">Honestidad y transparencia.</p>
-          </div>
-        </div>
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="value-item">
-            <div class="value-icon"><i class="bi bi-stars"></i></div>
-            <div class="value-title">Innovación</div>
-            <p class="text-muted small mb-0">Mejora continua y tecnología útil.</p>
-          </div>
-        </div>
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="value-item">
-            <div class="value-icon"><i class="bi bi-emoji-smile"></i></div>
-            <div class="value-title">Hospitalidad</div>
-            <p class="text-muted small mb-0">Calidez humana y cercanía.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HISTORIA (línea de tiempo) + MÉTRICAS -->
-  <section class="container pb-5">
-    <div class="row g-4">
+    <!-- Fila superior: historia + propósito -->
+    <div class="row g-3 mb-3">
       <div class="col-12 col-lg-7">
         <div class="soft-card h-100">
-          <h6 class="fw-semibold mb-3">Nuestra Historia</h6>
-          <div class="timeline">
-            <div class="t-item">
-              <span class="t-dot"></span>
-              <div class="t-year">1985</div>
-              <p class="t-text">Apertura del primer edificio con 40 habitaciones en el centro de la ciudad.</p>
-            </div>
-            <div class="t-item">
-              <span class="t-dot"></span>
-              <div class="t-year">1998</div>
-              <p class="t-text">Expansión a 120 habitaciones e incorporación de salones para eventos.</p>
-            </div>
-            <div class="t-item">
-              <span class="t-dot"></span>
-              <div class="t-year">2012</div>
-              <p class="t-text">Renovación completa: nuevas suites, spa y gimnasio.</p>
-            </div>
-            <div class="t-item">
-              <span class="t-dot"></span>
-              <div class="t-year">2023</div>
-              <p class="t-text">Estrategia de sostenibilidad: eficiencia energética y programas locales.</p>
-            </div>
-          </div>
+          <h6>Nuestra historia</h6>
+          <p>
+            {{ config_general.hotel_nombre|default:"Hotel Elegance" }} nació con la idea de ofrecer una experiencia
+            diferente en el corazón de la ciudad: un hotel urbano con alma boutique.
+          </p>
+          <p>
+            Desde la selección del mobiliario hasta el diseño de cada habitación, buscamos que los espacios sean
+            funcionales, acogedores y llenos de detalles. Nuestro equipo combina años de experiencia en hospitalidad
+            con una vocación genuina por el servicio.
+          </p>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="soft-card h-100">
+          <h6>Nuestro propósito</h6>
+          <p>
+            Crear un lugar donde cada huésped se sienta escuchado, acompañado y cuidado, desde el primer contacto
+            hasta después del check-out.
+          </p>
+          <p>
+            Creemos en la hospitalidad cercana, en los detalles que marcan la diferencia y en construir relaciones
+            de confianza a largo plazo con nuestros huéspedes.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fila inferior: hitos + equipo -->
+    <div class="row g-3">
+      <div class="col-12 col-lg-7">
+        <div class="soft-card h-100">
+          <h6>Hitos principales</h6>
+          <ul class="timeline mt-2">
+            <li class="timeline-item">
+              <div class="timeline-bullet"></div>
+              <div class="timeline-title">Apertura del hotel</div>
+              <div class="timeline-text">
+                Año 2015 – Apertura de {{ config_general.hotel_nombre|default:"Hotel Elegance" }} con 40 habitaciones
+                y un pequeño restaurante.
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="timeline-bullet"></div>
+              <div class="timeline-title">Ampliación de servicios</div>
+              <div class="timeline-text">
+                Año 2018 – Inauguración de la piscina climatizada, spa y primer salón para eventos corporativos.
+              </div>
+            </li>
+            <li class="timeline-item">
+              <div class="timeline-bullet"></div>
+              <div class="timeline-title">Transformación digital</div>
+              <div class="timeline-text">
+                Año 2022 – Implementamos check-in ágil, comunicación digital con huéspedes y herramientas
+                para gestionar mejor las reservas.
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
 
       <div class="col-12 col-lg-5">
         <div class="soft-card h-100">
-          <h6 class="fw-semibold mb-3">En Números</h6>
-          <div class="row text-center">
-            <div class="col-6 kpi">
-              <div class="num">35+</div>
-              <div class="sub">Años de servicio</div>
+          <h6>Equipo directivo</h6>
+          <div class="row g-3 mt-1">
+            <div class="col-6">
+              <div class="team-card">
+                <div class="team-avatar">AG</div>
+                <div class="team-name">Andrea Gómez</div>
+                <div class="team-role">Gerente General</div>
+              </div>
             </div>
-            <div class="col-6 kpi">
-              <div class="num">98%</div>
-              <div class="sub">Satisfacción</div>
+            <div class="col-6">
+              <div class="team-card">
+                <div class="team-avatar">CM</div>
+                <div class="team-name">Carlos Martínez</div>
+                <div class="team-role">Jefe de Operaciones</div>
+              </div>
             </div>
-            <div class="col-6 kpi">
-              <div class="num">10</div>
-              <div class="sub">Salones de eventos</div>
+            <div class="col-6">
+              <div class="team-card">
+                <div class="team-avatar">LS</div>
+                <div class="team-name">Laura Sánchez</div>
+                <div class="team-role">Coordinadora de Eventos</div>
+              </div>
             </div>
-            <div class="col-6 kpi">
-              <div class="num">180</div>
-              <div class="sub">Habitaciones y suites</div>
+            <div class="col-6">
+              <div class="team-card">
+                <div class="team-avatar">DP</div>
+                <div class="team-name">Diego Pérez</div>
+                <div class="team-role">Jefe de Recepción</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </main>
 
   <!-- FOOTER -->
-  <footer class="mt-5">
-    <div class="container py-5">
-      <div class="row g-4">
-        <div class="col-12 col-md-3">
-          <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-building me-2"></i>
-            <strong>Hotel Elegance</strong>
-          </div>
-          <p class="text-muted small mb-0">Lujo y confort excepcional en el corazón de la ciudad.</p>
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <div class="fw-semibold mb-1">{{ config_general.hotel_nombre|default:"Hotel Elegance" }}</div>
+          <p class="small-muted mb-0">
+            Creemos en la hospitalidad cercana, los detalles bien pensados y las experiencias que se recuerdan.
+          </p>
         </div>
-
-        <div class="col-6 col-md-3">
-          <h6 class="fw-semibold mb-3">Enlaces Rápidos</h6>
-          <ul class="list-unstyled small text-muted">
-            <li><a class="link-secondary text-decoration-none" href="#">Inicio</a></li>
-            <li><a class="link-secondary text-decoration-none" href="#">Habitaciones</a></li>
-            <li><a class="link-secondary text-decoration-none" href="#">Servicios</a></li>
-          </ul>
+        <div class="col-12 col-md-4">
+          <h6 class="fw-semibold mb-2">Ubicación</h6>
+          <p class="small mb-0">
+            <i class="bi bi-geo-alt me-2"></i>{{ config_general.hotel_direccion|default:"Av. Principal 123" }}
+          </p>
         </div>
-
-        <div class="col-6 col-md-3">
-          <h6 class="fw-semibold mb-3">Servicios</h6>
-          <ul class="list-unstyled small text-muted">
-            <li>Restaurante</li>
-            <li>Spa & Wellness</li>
-            <li>Centro de Negocios</li>
-            <li>Eventos</li>
-          </ul>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <h6 class="fw-semibold mb-3">Contacto</h6>
-          <ul class="list-unstyled small text-muted">
-            <li><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</li>
-            <li><i class="bi bi-envelope me-2"></i>info@hotelelegance.com</li>
-            <li><i class="bi bi-geo-alt me-2"></i>Av. Principal 123</li>
-          </ul>
+        <div class="col-12 col-md-4">
+          <h6 class="fw-semibold mb-2">Contacto directo</h6>
+          <p class="small mb-1">
+            <i class="bi bi-telephone me-2"></i>{{ config_general.hotel_telefono|default:"+1 (555) 123-4567" }}
+          </p>
+          <p class="small mb-0">
+            <i class="bi bi-envelope me-2"></i>{{ config_general.hotel_email|default:"info@hotelelegance.com" }}
+          </p>
         </div>
       </div>
-
-      <div class="footer-bottom text-center pt-3 mt-4">
-        <p class="small mb-0">© 2024 Hotel Elegance. Todos los derechos reservados.</p>
+      <div class="footer-bottom text-center mt-2">
+        &copy; {{ config_general.hotel_nombre|default:"Hotel Elegance" }} · {% now "Y" %}
       </div>
     </div>
   </footer>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Script opcional para marcar activo cuando navegues con archivos planos -->
   <script>
-    (function() {
-      const current = (window.location.pathname.replace(/\/+$/,'').split('/').filter(Boolean)[0] || 'nosotros').toLowerCase();
+    (function(){
+      const current = "nosotros";
       document.querySelectorAll('.navbar .nav-link').forEach(a=>{
         const r = (a.dataset.route || '').toLowerCase();
         if (r && r === current) {

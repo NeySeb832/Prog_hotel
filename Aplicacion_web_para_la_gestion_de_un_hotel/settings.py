@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'habitaciones',
     'operaciones',
     'clientes',
+    'reportes',
+    'configuracion',
+    'servicios',
 
 ]
 
@@ -57,7 +60,7 @@ AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
 
 # Fallback si alguna util necesita una URL por defecto
-LOGOUT_REDIRECT_URL = "accounts:post_login"
+LOGOUT_REDIRECT_URL = "dashboard:home"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -82,6 +85,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'configuracion.context_processors.configuracion_general',
+
             ],
         },
     },

@@ -1,0 +1,151 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}Mis reservas · Hotel Elegance{% endblock %}
+
+{% block content %}
+
+{% url 'reservas:nueva' as url_nueva_reserva %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">Mis reservas</h1>
+    <p class="text-muted mb-0">
+      Aquí puedes ver todas las reservas que has realizado en el hotel.
+    </p>
+  </div>
+  <div>
+    <a href="{{ url_nueva_reserva }}" class="btn btn-primary btn-sm">
+      Nueva reserva
+    </a>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    {% if reservas %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Código</th>
+              <th>Habitación</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Noches</th>
+              <th>Huéspedes</th>
+              <th>Estado</th>
+              <th class="text-end">Total</th>
+              <th class="text-end">Pendiente</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in reservas %}
+              <tr>
+                <td>{{ r.code }}</td>
+                <td>
+                  {{ r.room.codigo }}
+                  {% if r.room.tipo %}
+                    <br>
+                    <small class="text-muted">{{ r.room.tipo.nombre }}</small>
+                  {% endif %}
+                </td>
+                <td>{{ r.check_in }}</td>
+                <td>{{ r.check_out }}</td>
+                <td>{{ r.nights }}</td>
+                <td>
+                  {{ r.adults }} adultos
+                  {% if r.children %}
+                    · {{ r.children }} niños
+                  {% endif %}
+                </td>
+                <td>
+                  {% if r.status == 'PENDING' %}
+                    <span class="badge bg-warning text-dark">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% elif r.status == 'CONFIRMED' %}
+                    <span class="badge bg-info text-dark">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% elif r.status == 'CHECKED_IN' %}
+                    <span class="badge bg-primary">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% elif r.status == 'CHECKED_OUT' %}
+                    <span class="badge bg-success">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% elif r.status == 'CANCELLED' %}
+                    <span class="badge bg-secondary">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% else %}
+                    <span class="badge bg-light text-dark">
+                      {{ r.get_status_display }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  ${{ r.total_amount }}
+                </td>
+                <td class="text-end">
+                  {% if r.pending_amount > 0 %}
+                    <span class="text-danger">
+                      ${{ r.pending_amount }}
+                    </span>
+                  {% else %}
+                    <span class="text-success">Pagado</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <!-- Ver detalle: siempre disponible -->
+                  <a href="{% url 'reservas:detalle_cliente' r.pk %}"
+                     class="btn btn-outline-secondary btn-sm me-1">
+                    Ver
+                  </a>
+
+                  <!-- Botón pagar: solo si hay saldo pendiente -->
+                  {% if r.pending_amount > 0 %}
+                    <a href="{% url 'reservas:pago_cliente' r.pk %}"
+                       class="btn btn-success btn-sm me-1">
+                      Pagar
+                    </a>
+                  {% endif %}
+
+                  <!-- Modificar / Cancelar: solo si está pendiente o confirmada -->
+                  {% if r.status == 'PENDING' or r.status == 'CONFIRMED' %}
+                    <a href="{% url 'reservas:editar_cliente' r.pk %}"
+                       class="btn btn-outline-primary btn-sm me-1">
+                      Modificar
+                    </a>
+                    <form action="{% url 'reservas:cancelar_cliente' r.pk %}"
+                          method="post" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="btn btn-outline-danger btn-sm"
+                              onclick="return confirm('¿Seguro que deseas cancelar esta reserva?');">
+                        Cancelar
+                      </button>
+                    </form>
+                  {% elif r.pending_amount <= 0 %}
+                    {# Solo mostramos "Sin acciones" si ya no se puede ni pagar ni modificar #}
+                    <button class="btn btn-outline-secondary btn-sm" disabled>
+                      Sin acciones
+                    </button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="p-3 mb-0 text-muted">
+        Aún no tienes reservas registradas.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

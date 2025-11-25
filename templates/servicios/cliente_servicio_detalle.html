@@ -1,0 +1,202 @@
+{% extends "accounts/base_cliente.html" %}
+
+{% block title %}Detalle de servicio · {{ consumo.servicio.nombre }} · Hotel Elegance{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h4 mb-1">
+      Detalle de servicio · {{ consumo.servicio.nombre }}
+    </h1>
+    <p class="text-muted mb-0">
+      Asociado a la reserva {{ consumo.reserva.code }}.
+    </p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'servicios:cliente_mis_servicios' %}"
+       class="btn btn-outline-secondary btn-sm">
+      Volver a mis servicios
+    </a>
+
+    {% if consumo.saldo_pendiente > 0 and consumo.estado != 'CANCELADO' %}
+      <a href="{% url 'servicios:cliente_pago' consumo.pk %}"
+         class="btn btn-success btn-sm">
+        Pagar servicio
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Información principal del servicio -->
+<div class="row g-3 mb-3">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Información del servicio</h5>
+
+        <dl class="row mb-0">
+          <dt class="col-sm-4 text-muted">Servicio</dt>
+          <dd class="col-sm-8 fw-semibold">
+            {{ consumo.servicio.nombre }}
+            <div class="text-muted small">
+              {{ consumo.servicio.get_categoria_display }}
+            </div>
+          </dd>
+
+          <dt class="col-sm-4 text-muted mt-2">Reserva</dt>
+          <dd class="col-sm-8 mt-2">
+            <div class="fw-semibold">
+              {{ consumo.reserva.code }}
+            </div>
+            <div class="text-muted small">
+              Hab {{ consumo.reserva.room.codigo }}
+              {% if consumo.reserva.room.tipo %}
+                · {{ consumo.reserva.room.tipo.nombre }}
+              {% endif %}
+            </div>
+            <div class="text-muted small">
+              {{ consumo.reserva.check_in }} → {{ consumo.reserva.check_out }}
+            </div>
+          </dd>
+
+          <dt class="col-sm-4 text-muted mt-2">Fecha solicitud</dt>
+          <dd class="col-sm-8 mt-2">
+            {{ consumo.creado_en|date:"Y-m-d H:i" }}
+          </dd>
+
+          <dt class="col-sm-4 text-muted mt-2">Estado</dt>
+          <dd class="col-sm-8 mt-2">
+            {% if consumo.estado == 'PENDIENTE' %}
+              <span class="badge bg-warning text-dark">
+                {{ consumo.get_estado_display }}
+              </span>
+            {% elif consumo.estado == 'APROBADO' %}
+              <span class="badge bg-info text-dark">
+                {{ consumo.get_estado_display }}
+              </span>
+            {% elif consumo.estado == 'FACTURADO' %}
+              <span class="badge bg-success">
+                {{ consumo.get_estado_display }}
+              </span>
+            {% elif consumo.estado == 'CANCELADO' %}
+              <span class="badge bg-secondary">
+                {{ consumo.get_estado_display }}
+              </span>
+            {% else %}
+              <span class="badge bg-light text-dark">
+                {{ consumo.get_estado_display }}
+              </span>
+            {% endif %}
+          </dd>
+
+          {% if consumo.notas %}
+            <dt class="col-sm-4 text-muted mt-2">Notas</dt>
+            <dd class="col-sm-8 mt-2">
+              {{ consumo.notas }}
+            </dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Información financiera</h5>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="text-muted small text-uppercase mb-1">Cantidad</div>
+            <div class="fw-semibold">
+              {{ consumo.cantidad }}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small text-uppercase mb-1">Precio unitario</div>
+            <div class="fw-semibold">
+              ${{ consumo.precio_unitario }}
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="text-muted small text-uppercase mb-1">Total servicio</div>
+            <div class="fw-semibold">
+              ${{ consumo.total }}
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small text-uppercase mb-1">Total pagado</div>
+            <div class="fw-semibold">
+              ${{ consumo.total_pagado }}
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="text-muted small text-uppercase mb-1">Saldo pendiente</div>
+            {% if consumo.saldo_pendiente > 0 %}
+              <div class="fw-semibold text-danger">
+                ${{ consumo.saldo_pendiente }}
+              </div>
+            {% else %}
+              <div class="fw-semibold text-success">
+                $0 · Pagado
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pagos registrados -->
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="card-title mb-0">Pagos registrados</h5>
+      {% if consumo.saldo_pendiente > 0 and consumo.estado != 'CANCELADO' %}
+        <a href="{% url 'servicios:cliente_pago' consumo.pk %}"
+           class="btn btn-success btn-sm">
+          Registrar pago
+        </a>
+      {% endif %}
+    </div>
+
+    {% if pagos %}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Fecha</th>
+              <th>Método</th>
+              <th>Monto</th>
+              <th>Referencia</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in pagos %}
+              <tr>
+                <td>{{ p.created_at|date:"Y-m-d H:i" }}</td>
+                <td>{{ p.get_method_display }}</td>
+                <td>${{ p.amount }}</td>
+                <td>{{ p.reference|default:"—" }}</td>
+                <td class="text-muted small">
+                  {% if p.notes %}{{ p.notes }}{% else %}—{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-muted mb-0">
+        Aún no hay pagos registrados para este servicio.
+      </p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

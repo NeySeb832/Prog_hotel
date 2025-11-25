@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -83,6 +84,7 @@ class Reservation(models.Model):
     @property
     def base_rate(self):
         """Tarifa base / noche según el tipo de habitación."""
+        # Ajusta esto si tu precio está en otro lado (tipo.precio_noche, etc.)
         return getattr(self.room, "precio_noche", 0)
 
     @property
@@ -109,12 +111,67 @@ class Reservation(models.Model):
         """Indica si la reserva está totalmente pagada."""
         return self.pending_amount <= 0
 
+    # ---------- Validaciones de negocio ----------
+
+    def clean(self):
+        """
+        - Valida que check_out > check_in.
+        - Impide solapamiento de reservas activas para la misma habitación.
+
+        Dos rangos [in1, out1) y [in2, out2) se solapan si:
+            in1 < out2 AND out1 > in2
+        """
+        super().clean()
+
+        # Validación básica de rango de fechas
+        if self.check_in and self.check_out:
+            if self.check_out <= self.check_in:
+                raise ValidationError(
+                    "La fecha de salida debe ser posterior a la fecha de llegada."
+                )
+
+        # Necesitamos habitación y fechas para validar solapamiento
+        if not (self.room_id and self.check_in and self.check_out):
+            return
+
+        # Estados que bloquean la habitación (no cuentan canceladas ni finalizadas)
+        estados_bloqueo = [
+            self.Status.PENDING,
+            self.Status.CONFIRMED,
+            self.Status.CHECKED_IN,
+        ]
+
+        # Buscar reservas que se solapen con esta
+        reservas_solapadas = (
+            Reservation.objects
+            .filter(
+                room=self.room,
+                status__in=estados_bloqueo,
+            )
+            .filter(
+                check_in__lt=self.check_out,   # inicio existente < fin nueva
+                check_out__gt=self.check_in,   # fin existente > inicio nueva
+            )
+        )
+
+        # Al editar, no nos comparamos con nosotros mismos
+        if self.pk:
+            reservas_solapadas = reservas_solapadas.exclude(pk=self.pk)
+
+        if reservas_solapadas.exists():
+            raise ValidationError(
+                "La habitación ya está reservada en ese rango de fechas. "
+                "Selecciona otras fechas u otra habitación."
+            )
+
     # ---------- Lógica de guardado ----------
 
     def save(self, *args, **kwargs):
         """
         - Autocompleta datos del huésped a partir de `guest` si están vacíos.
+        - Valida reglas de negocio (full_clean).
         - Genera un código de reserva único si aún no tiene.
+        - Sincroniza el estado de la habitación con el estado de la reserva.
         """
         # Autocompletar datos del huésped
         if self.guest:
@@ -133,9 +190,14 @@ class Reservation(models.Model):
 
             # Teléfono (intentamos con atributos típicos)
             if not self.guest_phone:
-                phone = getattr(self.guest, "phone", "") or getattr(self.guest, "telefono", "")
+                phone = getattr(self.guest, "phone", "") or getattr(
+                    self.guest, "telefono", ""
+                )
                 if phone:
                     self.guest_phone = phone
+
+        # Ejecutar validaciones (incluye clean)
+        self.full_clean()
 
         is_new = self.pk is None
         super().save(*args, **kwargs)
@@ -147,37 +209,75 @@ class Reservation(models.Model):
             Reservation.objects.filter(pk=self.pk).update(code=new_code)
             self.code = new_code
 
-    # ---------- Cambio de estado + sincronización con habitación ----------
+        # --- Sincronizar estado de la habitación con la reserva ---
+        if not self.room_id:
+            return
 
-    def _update_room_status(self, new_room_status: str):
-        """Actualiza el estado de la habitación si es distinto."""
-        if self.room and self.room.estado != new_room_status:
-            self.room.estado = new_room_status
-            self.room.save(update_fields=["estado"])
+        # Estados de la habitación que NO tocamos (mantenimiento / fuera de servicio)
+        estados_protegidos = {
+            RoomStatus.MANTENIMIENTO,
+            RoomStatus.FUERA_SERVICIO,
+        }
+
+        room = self.room
+
+        # Si la habitación está en mantenimiento o fuera de servicio, no la tocamos
+        if room.estado in estados_protegidos:
+            return
+
+        nuevo_estado = room.estado
+
+        # Si la reserva está con check-in → habitación OCUPADA
+        if self.status == self.Status.CHECKED_IN:
+            nuevo_estado = RoomStatus.OCUPADA
+
+        # Si la reserva está pendiente o confirmada → habitación RESERVADA
+        elif self.status in (self.Status.PENDING, self.Status.CONFIRMED):
+            nuevo_estado = RoomStatus.RESERVADA
+
+        # Si la reserva terminó o se canceló → intentar dejar la habitación LIBRE
+        elif self.status in (self.Status.CHECKED_OUT, self.Status.CANCELLED):
+            hoy = timezone.localdate()
+            # Verificamos si hay otra reserva que siga bloqueando la habitación
+            hay_otras_reservas = Reservation.objects.filter(
+                room=room,
+                status__in=[
+                    self.Status.PENDING,
+                    self.Status.CONFIRMED,
+                    self.Status.CHECKED_IN,
+                ],
+                check_in__lt=self.check_out,
+                check_out__gt=hoy,
+            ).exclude(pk=self.pk).exists()
+
+            if not hay_otras_reservas:
+                nuevo_estado = RoomStatus.LIBRE
+
+        if nuevo_estado != room.estado:
+            room.estado = nuevo_estado
+            room.save(update_fields=["estado"])
+
+    # ---------- Cambio de estado ----------
 
     def mark_confirmed(self):
-        """Marca la reserva como confirmada y la habitación como RESERVADA."""
+        """Marca la reserva como confirmada (habitación queda RESERVADA)."""
         self.status = self.Status.CONFIRMED
-        self._update_room_status(RoomStatus.RESERVADA)
-        self.save(update_fields=["status", "updated_at"])
+        self.save()
 
     def mark_checked_in(self):
-        """Marca la reserva como con check-in y la habitación como OCUPADA."""
+        """Marca la reserva como con check-in (habitación queda OCUPADA)."""
         self.status = self.Status.CHECKED_IN
-        self._update_room_status(RoomStatus.OCUPADA)
-        self.save(update_fields=["status", "updated_at"])
+        self.save()
 
     def mark_checked_out(self):
-        """Marca la reserva como finalizada y la habitación como LIBRE."""
+        """Marca la reserva como finalizada (habitación vuelve a LIBRE si no hay más reservas)."""
         self.status = self.Status.CHECKED_OUT
-        self._update_room_status(RoomStatus.LIBRE)
-        self.save(update_fields=["status", "updated_at"])
+        self.save()
 
     def mark_cancelled(self):
-        """Marca la reserva como cancelada y la habitación como LIBRE."""
+        """Marca la reserva como cancelada (habitación vuelve a LIBRE si no hay más reservas)."""
         self.status = self.Status.CANCELLED
-        self._update_room_status(RoomStatus.LIBRE)
-        self.save(update_fields=["status", "updated_at"])
+        self.save()
 
 
 class Payment(models.Model):
