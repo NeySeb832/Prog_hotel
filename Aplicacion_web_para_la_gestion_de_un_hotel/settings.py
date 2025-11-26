@@ -29,10 +29,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "OneySeb832@")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "0") == "1"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "Prog_hotel.onrender.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prog_hotel.onrender.com"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://Prog_hotel.onrender.com",
+    "https://prog_hotel.onrender.com",
 ]
 
 
@@ -109,7 +109,7 @@ WSGI_APPLICATION = 'Aplicacion_web_para_la_gestion_de_un_hotel.wsgi.application'
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
+        default=os.environ.get("postgresql://hotel_db_fnrr_user:GVYjrgPjGD7vk9ok5seBBf2OTqb8Q3Td@dpg-d4jopd7diees73b212lg-a/hotel_db_fnrr"),
         conn_max_age=600,
         ssl_require=True,
     )
