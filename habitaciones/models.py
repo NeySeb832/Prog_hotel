@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class RoomStatus(models.TextChoices):
@@ -6,7 +7,7 @@ class RoomStatus(models.TextChoices):
     RESERVADA = "RESERVADA", "Reservada"
     OCUPADA = "OCUPADA", "Ocupada"
     MANTENIMIENTO = "MANTENIMIENTO", "Mantenimiento"
-    BLOQUEADA = "BLOQUEADA", "Bloqueada"
+    BLOQUEADA = "BLOQUEADA", "Bloqueada"  # fuera de servicio / bloqueada
 
 
 class TipoHabitacion(models.Model):
@@ -15,6 +16,7 @@ class TipoHabitacion(models.Model):
     Define las características 'base' de un tipo de habitación.
     Todas las habitaciones de este tipo heredan estos valores.
     """
+
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.TextField(blank=True)
     capacidad_por_defecto = models.PositiveIntegerField(default=2)
@@ -37,6 +39,7 @@ class Habitacion(models.Model):
     - Capacidad, camas y precio_noche NO son campos editables aquí.
       Se obtienen siempre desde el TipoHabitacion asociado.
     """
+
     codigo = models.CharField(max_length=20, unique=True)
     nombre = models.CharField(max_length=80, blank=True)
 
@@ -98,3 +101,95 @@ class Habitacion(models.Model):
             "MANTENIMIENTO": "estado-mantenimiento",
             "BLOQUEADA": "estado-bloqueada",
         }.get(self.estado, "")
+
+    # ---------- Lógica de reservas asociadas ----------
+
+    def _compute_reservas_cache(self):
+        """
+        Calcula y cachea:
+        - current_reservation: reserva ACTIVA hoy (o la más reciente si la
+          habitación figura OCUPADA pero no hay rango exacto).
+        - next_reservation: próxima reserva futura para la habitación.
+        """
+        from reservas.models import Reservation  # import local para evitar ciclos
+
+        hoy = timezone.localdate()
+
+        # Estados de reserva que bloquean la hab
+        estados_bloqueo = [
+            Reservation.Status.PENDING,
+            Reservation.Status.CONFIRMED,
+            Reservation.Status.CHECKED_IN,
+        ]
+
+        qs = (
+            self.reservas
+            .filter(status__in=estados_bloqueo)
+            .order_by("check_in")
+        )
+
+        # 1) Reserva en curso: hoy dentro del rango [check_in, check_out)
+        current = (
+            qs.filter(check_in__lte=hoy, check_out__gt=hoy)
+            .order_by("check_in")
+            .first()
+        )
+
+        # Fallback: si la hab está marcada OCUPADA pero no hay rango exacto,
+        # tomamos la última que haya empezado.
+        if current is None and self.estado == RoomStatus.OCUPADA:
+            current = (
+                qs.filter(check_in__lte=hoy)
+                .order_by("-check_in")
+                .first()
+            )
+
+        # 2) Próxima reserva futura (excluyendo la actual si existe)
+        next_qs = qs.filter(check_in__gte=hoy)
+        if current is not None:
+            next_qs = next_qs.exclude(pk=current.pk)
+        next_res = next_qs.order_by("check_in").first()
+
+        self._current_reservation_cache = current
+        self._next_reservation_cache = next_res
+
+    @property
+    def current_reservation(self):
+        """
+        Reserva actualmente vigente para la habitación (si hay).
+
+        IMPORTANTE:
+        - Si la vista puso current_reservation = None, volvemos a calcular
+          desde la BD para evitar el "Sin reservas asociadas" cuando sí hay
+          una reserva válida.
+        """
+        if (
+            not hasattr(self, "_current_reservation_cache")
+            or self._current_reservation_cache is None
+        ):
+            self._compute_reservas_cache()
+        return getattr(self, "_current_reservation_cache", None)
+
+    @current_reservation.setter
+    def current_reservation(self, value):
+        """
+        Setter usado por la vista si quiere inyectar la reserva ya prefetchada
+        (pero si es None, el getter recalculará igualmente).
+        """
+        self._current_reservation_cache = value
+
+    @property
+    def next_reservation(self):
+        """
+        Próxima reserva futura (si existe).
+        """
+        if (
+            not hasattr(self, "_next_reservation_cache")
+            or self._next_reservation_cache is None
+        ):
+            self._compute_reservas_cache()
+        return getattr(self, "_next_reservation_cache", None)
+
+    @next_reservation.setter
+    def next_reservation(self, value):
+        self._next_reservation_cache = value

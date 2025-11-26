@@ -5,52 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cde98260-34b1-46db-bca2-aab09d506909" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/configuracion/context_processors.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configuracion/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configuracion/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/habitaciones/helpers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reportes/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/reportes/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/servicios/forms.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/servicios/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/configuracion/configuracion_general.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reportes/historial.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reportes/pdf_reporte.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reportes/resumen.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_mis_reservas.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_nueva.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_pago.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_reserva_detalle.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_room_service.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reservas/cliente_servicios.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_mis_servicios.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_detalle.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_nuevo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/cliente_servicio_pago.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/form_consumo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/form_pago_consumo.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/form_servicio.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/lista_consumos.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/servicios/lista_servicios.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Aplicacion_web_para_la_gestion_de_un_hotel/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/habitaciones/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/habitaciones/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/habitaciones/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/habitaciones/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/reservas.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/reservas/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reservas/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/reservas/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/reservas/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/portal_cliente.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/portal_cliente.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/registro.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/registro.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin_hotel/base_admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_hotel/base_admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin_hotel/reservas.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/base_cliente.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/contacto.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/contacto.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/nuestras_habitaciones.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/nuestras_habitaciones.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/nuestros_servicios.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/nuestros_servicios.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/dashboard/sobre_nosotros.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/dashboard/sobre_nosotros.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/reservas/factura_pago.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/reservas/factura_pago.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,6 +137,9 @@
       <workItem from="1763647260072" duration="2743000" />
       <workItem from="1763840234525" duration="11519000" />
       <workItem from="1763905245434" duration="19939000" />
+      <workItem from="1764036704561" duration="4181000" />
+      <workItem from="1764080533591" duration="1875000" />
+      <workItem from="1764086246341" duration="179000" />
     </task>
     <servers />
   </component>

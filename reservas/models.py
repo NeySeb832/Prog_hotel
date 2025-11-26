@@ -213,15 +213,15 @@ class Reservation(models.Model):
         if not self.room_id:
             return
 
-        # Estados de la habitación que NO tocamos (mantenimiento / fuera de servicio)
+        # Estados de la habitación que NO tocamos (mantenimiento / bloqueada)
         estados_protegidos = {
             RoomStatus.MANTENIMIENTO,
-            RoomStatus.FUERA_SERVICIO,
+            RoomStatus.BLOQUEADA,  # antes FUERA_SERVICIO
         }
 
         room = self.room
 
-        # Si la habitación está en mantenimiento o fuera de servicio, no la tocamos
+        # Si la habitación está en mantenimiento o bloqueada, no la tocamos
         if room.estado in estados_protegidos:
             return
 

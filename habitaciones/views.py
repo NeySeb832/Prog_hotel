@@ -15,8 +15,8 @@ class HabitacionesListView(LoginRequiredMixin, View):
     """
     Listado principal de habitaciones para el panel de administración.
     Integra información de reservas:
-      - Reserva actual (CHECKED_IN dentro del rango check-in / check-out)
-      - Próxima reserva futura (pendiente/confirmada o de hoy sin check-in)
+      - Reserva actual (CHECKED_IN)
+      - Próxima reserva futura (pendiente/confirmada o de hoy en adelante)
     """
     login_url = "/login/"
 
@@ -57,7 +57,7 @@ class HabitacionesListView(LoginRequiredMixin, View):
 
         today = timezone.localdate()
 
-        # Reservas relevantes para mostrar:
+        # Reservas relevantes para mostrar
         reservas_rel = (
             Reservation.objects
             .filter(
@@ -75,16 +75,16 @@ class HabitacionesListView(LoginRequiredMixin, View):
         next_by_room = {}
 
         for res in reservas_rel:
-            # 1) Estancias en curso: CHECKED_IN y dentro de fechas
-            if (
-                res.status == Reservation.Status.CHECKED_IN
-                and res.check_in <= today < res.check_out
-            ):
+            # 1) Estancias en curso:
+            #    cualquier reserva en estado CHECKED_IN se considera actual
+            if res.status == Reservation.Status.CHECKED_IN:
                 prev = current_by_room.get(res.room_id)
-                if prev is None or res.check_in < prev.check_in:
+                # Si hubiera varias (raro), nos quedamos con la de check_in más reciente
+                if prev is None or res.check_in > prev.check_in:
                     current_by_room[res.room_id] = res
 
-            # 2) Reservas desde hoy en adelante, que todavía NO están en check-in
+            # 2) Próximas reservas futuras (desde hoy en adelante),
+            #    que aún NO están en check-in
             elif res.check_in >= today:
                 prev = next_by_room.get(res.room_id)
                 if prev is None or res.check_in < prev.check_in:
